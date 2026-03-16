@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tilesworth McGee's Profanity Emporium</title>
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --surface: #16213e;
+    --card: #0f3460;
+    --accent1: #e94560;
+    --accent2: #f5a623;
+    --accent3: #00d4aa;
+    --accent4: #c77dff;
+    --text: #f0e6ff;
+    --muted: #8892b0;
+    --tile-bg: #f5e642;
+    --tile-text: #1a1a2e;
+    --board-bg: #0d2137;
+    --dw: #ff6b9d;
+    --tw: #ff3860;
+    --dl: #48cae4;
+    --tl: #0096c7;
+    --bonus: #00d4aa;
+    --center: #e94560;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(233,69,96,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(199,125,255,0.15) 0%, transparent 50%);
+  }
+
+  /* SETUP SCREEN */
+  #setup-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .logo {
+    font-family: 'Boogaloo', cursive;
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent4));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 30px rgba(233,69,96,0.5));
+    animation: logoWobble 3s ease-in-out infinite;
+  }
+
+  @keyframes logoWobble {
+    0%,100% { transform: rotate(-1deg); }
+    50% { transform: rotate(1deg); }
+  }
+
+  .tagline {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 3rem;
+    font-style: italic;
+  }
+
+  .setup-card {
+    background: var(--surface);
+    border: 2px solid var(--accent4);
+    border-radius: 20px;
+    padding: 2.5rem;
+    max-width: 460px;
+    width: 100%;
+    box-shadow: 0 0 60px rgba(199,125,255,0.2);
+  }
+
+  .setup-card h2 {
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    color: var(--accent2);
+  }
+
+  .player-inputs { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+
+  .player-input-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent3);
+  }
+
+  .player-input-group input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: var(--card);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 1rem;
+    font-family: 'Nunito', sans-serif;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  .player-input-group input:focus { border-color: var(--accent4); }
+
+  .start-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--accent1), var(--accent4));
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.6rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(233,69,96,0.4);
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(233,69,96,0.6); }
+
+  /* GAME SCREEN */
+  #game-screen { display: none; padding: 1rem; max-width: 900px; margin: 0 auto; }
+
+  .game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .game-title {
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .scoreboard {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .score-card {
+    background: var(--surface);
+    border: 2px solid var(--card);
+    border-radius: 12px;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    min-width: 100px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .score-card.active {
+    border-color: var(--accent2);
+    box-shadow: 0 0 20px rgba(245,166,35,0.3);
+  }
+
+  .score-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .score-val {
+    font-family: 'Boogaloo', cursive;
+    font-size: 2rem;
+    color: var(--accent2);
+    line-height: 1;
+  }
+
+  /* BOARD */
+  .board-wrap {
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+
+  #board {
+    display: grid;
+    grid-template-columns: repeat(15, 1fr);
+    gap: 2px;
+    background: #0a1628;
+    border: 3px solid var(--card);
+    border-radius: 12px;
+    padding: 4px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    aspect-ratio: 1;
+  }
+
+  .cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    font-size: clamp(0.35rem, 1.2vw, 0.6rem);
+    font-weight: 700;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.1s, box-shadow 0.1s;
+    background: var(--board-bg);
+    text-align: center;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .cell:hover { transform: scale(1.1); z-index: 2; }
+  .cell.dw { background: var(--dw); color: white; }
+  .cell.tw { background: var(--tw); color: white; }
+  .cell.dl { background: var(--dl); color: #0a1628; }
+  .cell.tl { background: var(--tl); color: white; }
+  .cell.star { background: var(--center); color: white; font-size: 1rem; }
+  .cell.bonus-sq { background: var(--bonus); color: #0a1628; }
+
+  .cell.has-tile {
+    background: var(--tile-bg) !important;
+    color: var(--tile-text) !important;
+    font-size: clamp(0.6rem, 1.8vw, 0.9rem);
+    font-weight: 900;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+    cursor: default;
+  }
+
+  .cell.has-tile .tile-score {
+    position: absolute;
+    bottom: 1px;
+    right: 2px;
+    font-size: 0.4em;
+    font-weight: 700;
+  }
+
+  .cell.placed-this-turn {
+    background: #ffe066 !important;
+    color: var(--tile-text) !important;
+    box-shadow: 0 0 8px rgba(255,224,102,0.8), 2px 2px 0 rgba(0,0,0,0.4) !important;
+    animation: placeGlow 0.3s ease-out;
+  }
+
+  @keyframes placeGlow {
+    0% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+
+  .cell.highlight { box-shadow: inset 0 0 0 2px var(--accent3); }
+
+  /* RACK */
+  .rack-section {
+    background: var(--surface);
+    border: 2px solid var(--card);
+    border-radius: 16px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .rack-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  #rack {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    min-height: 50px;
+    align-items: center;
+  }
+
+  .rack-tile {
+    width: 44px;
+    height: 44px;
+    background: var(--tile-bg);
+    color: var(--tile-text);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.2rem;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.5);
+    transition: transform 0.15s, box-shadow 0.15s;
+    user-select: none;
+    border: 2px solid transparent;
+  }
+
+  .rack-tile:hover { transform: translateY(-4px); box-shadow: 3px 7px 0 rgba(0,0,0,0.5); }
+
+  .rack-tile.selected {
+    border-color: var(--accent1);
+    transform: translateY(-6px);
+    box-shadow: 0 0 15px rgba(233,69,96,0.7), 3px 9px 0 rgba(0,0,0,0.5);
+  }
+
+  .rack-tile .tile-pts {
+    font-size: 0.5rem;
+    font-weight: 700;
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+  }
+
+  .rack-tile.blank-tile { background: #ccc; }
+
+  /* CONTROLS */
+  .controls {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .btn {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-submit {
+    background: linear-gradient(135deg, var(--accent3), #00b894);
+    color: #0a1628;
+    box-shadow: 0 4px 15px rgba(0,212,170,0.4);
+  }
+
+  .btn-recall {
+    background: var(--card);
+    color: var(--text);
+    border: 2px solid var(--muted);
+  }
+
+  .btn-pass {
+    background: var(--surface);
+    color: var(--accent1);
+    border: 2px solid var(--accent1);
+  }
+
+  .btn-shuffle {
+    background: linear-gradient(135deg, var(--accent4), #9b59b6);
+    color: white;
+  }
+
+  .btn-share {
+    background: linear-gradient(135deg, var(--accent2), #e67e22);
+    color: #0a1628;
+    box-shadow: 0 4px 15px rgba(245,166,35,0.4);
+    font-size: 1rem;
+  }
+
+  /* TRASH TALK */
+  #trash-talk-box {
+    background: var(--surface);
+    border: 2px solid var(--accent1);
+    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+    color: var(--accent2);
+    font-size: 0.95rem;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: trashIn 0.4s ease-out;
+  }
+
+  @keyframes trashIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .trash-icon { font-size: 1.4rem; }
+
+  /* STATUS */
+  #status-bar {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    color: var(--accent3);
+    font-weight: 700;
+  }
+
+  /* TILES LEFT */
+  .bag-info {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-size: 0.7rem;
+    margin-bottom: 1rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 2px solid var(--accent4);
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(199,125,255,0.4);
+  }
+
+  .modal h2 {
+    font-family: 'Boogaloo', cursive;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--accent2);
+  }
+
+  .modal p { margin-bottom: 1rem; color: var(--muted); line-height: 1.6; }
+
+  .modal .share-url {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 0.8rem;
+    font-size: 0.75rem;
+    word-break: break-all;
+    margin-bottom: 1rem;
+    color: var(--accent3);
+    cursor: pointer;
+    border: 1px solid var(--accent3);
+  }
+
+  .modal-btns { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+
+  /* BONUS POPUP */
+  .bonus-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, var(--accent1), var(--accent4));
+    color: white;
+    padding: 1.5rem 2.5rem;
+    border-radius: 20px;
+    font-family: 'Boogaloo', cursive;
+    font-size: 2.5rem;
+    z-index: 200;
+    pointer-events: none;
+    animation: popupAnim 2s forwards;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(233,69,96,0.8);
+  }
+
+  @keyframes popupAnim {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    15% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    25% { transform: translate(-50%, -50%) scale(1); }
+    70% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -60%) scale(0.9); }
+  }
+
+  /* TILE SCORE BADGE */
+  .word-score-badge {
+    position: fixed;
+    pointer-events: none;
+    font-family: 'Boogaloo', cursive;
+    font-size: 1.5rem;
+    color: var(--accent2);
+    text-shadow: 0 0 10px rgba(245,166,35,0.8);
+    animation: floatUp 1.5s forwards;
+    z-index: 150;
+  }
+
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-80px); }
+  }
+
+  /* GAME OVER */
+  #gameover-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .gameover-title {
+    font-family: 'Boogaloo', cursive;
+    font-size: clamp(3rem, 10vw, 6rem);
+    background: linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent4));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+    animation: logoWobble 2s infinite;
+  }
+
+  .final-scores {
+    display: flex;
+    gap: 2rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .final-score-card {
+    background: var(--surface);
+    border: 3px solid var(--accent4);
+    border-radius: 20px;
+    padding: 2rem;
+    min-width: 160px;
+  }
+
+  .final-score-card.winner {
+    border-color: var(--accent2);
+    box-shadow: 0 0 40px rgba(245,166,35,0.4);
+  }
+
+  .winner-crown { font-size: 2rem; }
+
+  .turn-indicator {
+    font-size: 0.85rem;
+    color: var(--accent3);
+    margin-bottom: 0.3rem;
+  }
+
+  /* Blank tile picker */
+  .blank-picker {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 6px;
+    margin: 1rem 0;
+  }
+
+  .blank-option {
+    padding: 0.4rem;
+    background: var(--tile-bg);
+    color: var(--tile-text);
+    border: none;
+    border-radius: 6px;
+    font-weight: 900;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+
+  .blank-option:hover { transform: scale(1.15); }
+
+  @media (max-width: 500px) {
+    .scoreboard { gap: 0.5rem; }
+    .score-card { min-width: 80px; padding: 0.4rem 0.6rem; }
+    .score-val { font-size: 1.6rem; }
+    .rack-tile { width: 38px; height: 38px; font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div class="logo">Tilesworth McGee's<br>Profanity Emporium</div>
+  <div class="tagline">"Where vocabulary goes to sin."</div>
+  <div class="setup-card">
+    <h2>🎲 Who's playing, degenerates?</h2>
+    <div class="player-inputs">
+      <div class="player-input-group">
+        <label>Player 1 Name</label>
+        <input type="text" id="p1name" placeholder="Your filthy name..." maxlength="20">
+      </div>
+      <div class="player-input-group">
+        <label>Player 2 Name</label>
+        <input type="text" id="p2name" placeholder="Their filthy name..." maxlength="20">
+      </div>
+    </div>
+    <button class="start-btn" onclick="startGame()">LET'S GET NASTY 🤬</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen">
+  <div class="game-header">
+    <div class="game-title">🤬 Tilesworth McGee's</div>
+    <div class="scoreboard">
+      <div class="score-card active" id="sc-p1">
+        <div class="score-name" id="sc-p1-name">P1</div>
+        <div class="score-val" id="sc-p1-val">0</div>
+      </div>
+      <div class="score-card" id="sc-p2">
+        <div class="score-name" id="sc-p2-name">P2</div>
+        <div class="score-val" id="sc-p2-val">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="trash-talk-box">
+    <span class="trash-icon">🗣️</span>
+    <span id="trash-talk-text">Game on. May the filthiest vocabulary win.</span>
+  </div>
+
+  <div id="status-bar">Loading game...</div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--tw)"></div> Triple Word</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--dw)"></div> Double Word</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--tl)"></div> Triple Letter</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--dl)"></div> Double Letter</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--bonus)"></div> 🤬 Bonus +10</div>
+  </div>
+
+  <div class="board-wrap">
+    <div id="board"></div>
+  </div>
+
+  <div class="rack-section">
+    <div class="rack-label">
+      <span id="turn-indicator">Your rack</span>
+      <span class="bag-info" id="bag-count"> · 📦 tiles left</span>
+    </div>
+    <div id="rack"></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-submit" onclick="submitWord()">✅ Submit Word</button>
+    <button class="btn btn-recall" onclick="recallTiles()">↩️ Recall</button>
+    <button class="btn btn-shuffle" onclick="shuffleRack()">🔀 Shuffle</button>
+    <button class="btn btn-pass" onclick="passTurn()">⏭️ Pass</button>
+    <button class="btn btn-share" onclick="showShareModal()">📤 Send Turn</button>
+  </div>
+</div>
+
+<!-- GAME OVER SCREEN -->
+<div id="gameover-screen">
+  <div class="gameover-title">GAME OVER,<br>SUCKERS!</div>
+  <div class="final-scores" id="final-scores"></div>
+  <button class="btn btn-submit" style="font-size:1.4rem;padding:1rem 2rem;" onclick="location.reload()">🎲 New Game</button>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal">
+    <h2>📤 Send Your Turn</h2>
+    <p>Copy this URL and send it to your opponent. It contains the entire game state.</p>
+    <div class="share-url" id="share-url-text" onclick="copyShareUrl()">Click to copy...</div>
+    <div id="share-copied" style="color:var(--accent3);font-weight:700;display:none;margin-bottom:0.5rem;">✅ Copied to clipboard!</div>
+    <div class="modal-btns">
+      <button class="btn btn-submit" onclick="copyShareUrl()">📋 Copy URL</button>
+      <button class="btn btn-recall" onclick="closeModal('share-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- BLANK TILE MODAL -->
+<div class="modal-overlay" id="blank-modal">
+  <div class="modal">
+    <h2>🃏 Blank Tile — Pick a Letter</h2>
+    <p>Choose which letter this blank tile will represent.</p>
+    <div class="blank-picker" id="blank-picker"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// TILE DATA
+// ============================================================
+const TILE_DATA = {
+  A:{count:9,val:1}, B:{count:2,val:3}, C:{count:2,val:3}, D:{count:4,val:2},
+  E:{count:12,val:1}, F:{count:2,val:4}, G:{count:3,val:2}, H:{count:2,val:4},
+  I:{count:9,val:1}, J:{count:1,val:8}, K:{count:1,val:5}, L:{count:4,val:1},
+  M:{count:2,val:3}, N:{count:6,val:1}, O:{count:8,val:1}, P:{count:2,val:3},
+  Q:{count:1,val:10}, R:{count:6,val:1}, S:{count:4,val:1}, T:{count:6,val:1},
+  U:{count:4,val:1}, V:{count:2,val:4}, W:{count:2,val:4}, X:{count:1,val:8},
+  Y:{count:2,val:4}, Z:{count:1,val:10}, '_':{count:2,val:0}
+};
+
+// ============================================================
+// WORD LIST — Standard + Slang + Profanity
+// Standard common words (subset for bundle size)
+// ============================================================
+const STANDARD_WORDS = new Set([
+  // Common short words
+  "AA","AB","AD","AE","AG","AH","AI","AL","AM","AN","AR","AS","AT","AW","AX","AY",
+  "BA","BE","BI","BO","BY","DA","DE","DO","ED","EF","EH","EL","EM","EN","ER","ES",
+  "ET","EX","FA","FE","GI","GO","HA","HE","HI","HM","HO","ID","IF","IN","IS","IT",
+  "JO","KA","KI","LA","LI","LO","MA","ME","MI","MM","MO","MU","MY","NA","NE","NO",
+  "NU","OD","OE","OF","OH","OI","OM","ON","OP","OR","OS","OW","OX","OY","PA","PE",
+  "PI","PO","QI","RE","SI","SO","TA","TI","TO","UH","UM","UN","UP","US","UT","WE",
+  "WO","XI","XU","YA","YE","YO","ZA",
+  // Common 3-letter
+  "ACE","ACT","ADD","AGE","AGO","AID","AIM","AIR","ALL","AND","ANT","ANY","APE",
+  "APP","ARM","ART","ASH","ASK","ATE","AXE","BAD","BAG","BAN","BAR","BAT","BAY",
+  "BED","BET","BIG","BIT","BOX","BOY","BUD","BUG","BUN","BUS","BUT","BUY","CAB",
+  "CAN","CAP","CAR","CAT","COB","COD","COG","COP","COT","COW","CRY","CUB","CUP",
+  "CUR","CUT","DAD","DAM","DAY","DEN","DEW","DID","DIG","DIM","DIP","DOC","DOE",
+  "DOG","DOT","DRY","DUB","DUG","DUO","DYE","EAR","EAT","EEL","EGG","ELF","ELK",
+  "END","ERA","EVE","EWE","EYE","FAN","FAR","FAT","FAX","FEE","FEW","FIG","FIN",
+  "FIT","FIX","FLY","FOB","FOE","FOG","FOP","FOR","FOX","FRY","FUN","FUR","GAB",
+  "GAG","GAP","GAS","GAY","GEL","GEM","GET","GIN","GNU","GOD","GOT","GUM","GUN",
+  "GUY","GYM","HAD","HAM","HAS","HAT","HAY","HEN","HER","HEW","HIM","HIP","HIS",
+  "HIT","HOB","HOG","HOP","HOT","HOW","HUB","HUG","HUM","HUT","ICE","ILL","INN",
+  "ION","IRE","JAB","JAG","JAM","JAR","JAW","JAY","JET","JIG","JOB","JOG","JOT",
+  "JOY","JUG","JUT","KEG","KEY","KID","KIT","LAB","LAD","LAP","LAW","LAX","LAY",
+  "LEA","LED","LEG","LET","LID","LIP","LIT","LOG","LOT","LOW","LUG","MAD","MAP",
+  "MAR","MAT","MAW","MAX","MAY","MEN","MET","MOB","MOD","MOM","MOP","MOW","MUD",
+  "MUG","NAB","NAG","NAP","NAY","NET","NEW","NIB","NIT","NOB","NOD","NOR","NOT",
+  "NOW","NUB","NUN","NUT","OAK","OAR","OAT","ODD","ODE","OFF","OFT","OHM","OIL",
+  "OLD","OPT","ORB","ORE","OUR","OUT","OWE","OWL","OWN","PAD","PAL","PAN","PAP",
+  "PAR","PAT","PAW","PAY","PEA","PEG","PEN","PEP","PET","PIE","PIG","PIN","PIT",
+  "PLY","POD","POP","POT","POW","PRO","PRY","PUB","PUG","PUN","PUP","PUS","PUT",
+  "RAG","RAM","RAN","RAP","RAT","RAW","RAY","RED","REF","RIB","RID","RIG","RIM",
+  "RIP","ROB","ROD","ROT","ROW","RUB","RUG","RUM","RUN","RUT","SAC","SAG","SAP",
+  "SAT","SAW","SAY","SEA","SET","SEW","SHE","SHY","SIP","SIT","SIX","SKI","SKY",
+  "SLY","SOB","SOD","SON","SOP","SOT","SOW","SOY","SPA","SPY","STY","SUB","SUM",
+  "SUN","SUP","TAB","TAN","TAP","TAR","TAX","TAY","TEA","TEN","THE","TIE","TIN",
+  "TIP","TOE","TON","TOO","TOP","TOW","TOY","TUB","TUG","TUN","TWO","URN","USE",
+  "VAN","VAT","VET","VIA","VIE","VOW","WAD","WAR","WAS","WAX","WAY","WEB","WED",
+  "WEE","WIG","WIN","WIT","WOE","WOK","WON","WOO","WOW","YAK","YAM","YAP","YAW",
+  "YEA","YEP","YEW","YIP","YOU","ZAG","ZAP","ZEN","ZIG","ZIP","ZIT","ZOO",
+  // Common longer words
+  "ABLE","ACHE","ACID","AGED","ALSO","AMOK","AMPS","ANTE","ARCH","AREA","ARMY",
+  "ARTS","ASAP","ATOM","AUNT","AUTO","AVID","AWAY","AWED","AXED","BABE","BACK",
+  "BAIT","BAKE","BALD","BALE","BALL","BALM","BAND","BANG","BANK","BARE","BARK",
+  "BARN","BASE","BASH","BASK","BASS","BATH","BEAD","BEAK","BEAM","BEAN","BEAR",
+  "BEAT","BEEF","BEEN","BEER","BEET","BELL","BELT","BEND","BILE","BILL","BIND",
+  "BIRD","BITE","BLED","BLEW","BLOB","BLOG","BLOW","BLUE","BOAR","BOAT","BOLD",
+  "BOLT","BOMB","BONE","BOOK","BOOM","BOOT","BORE","BORN","BOTH","BOUT","BOWL",
+  "BRED","BREW","BRIM","BUCK","BUFF","BULB","BULK","BULL","BUMP","BUNK","BURN",
+  "BURP","BURR","BURY","BUSH","BUSY","BUZZ","CAGE","CAKE","CALF","CALL","CALM",
+  "CAME","CANE","CAPE","CARD","CARE","CAST","CAVE","CELL","CHAT","CHEF","CHEW",
+  "CHIP","CHOP","CHOW","CITE","CITY","CLAD","CLAM","CLAP","CLAW","CLAY","CLOD",
+  "CLOP","CLUB","CLUE","COAL","COAT","CODE","COIL","COIN","COLD","COLT","COMB",
+  "COME","COOK","COOL","COPY","CORD","CORE","CORN","COST","COZY","CRAG","CRAM",
+  "CROP","CROW","CRUD","CUBE","CURB","CURE","DARK","DART","DASH","DATA","DATE",
+  "DAWN","DAYS","DEAD","DEAF","DEAL","DEAN","DEAR","DEBT","DECK","DEED","DEEP",
+  "DEMO","DENY","DESK","DIAL","DICE","DIET","DIRT","DISK","DIVE","DOCK","DOES",
+  "DOLL","DOME","DONE","DOOM","DOOR","DOSE","DOWN","DRAG","DRAW","DREW","DRIP",
+  "DROP","DRUG","DRUM","DUAL","DULL","DUMB","DUMP","DUNK","DUSK","DUST","DUTY",
+  "EACH","EARL","EARN","EASE","EAST","EASY","EDGE","EMIT","EPIC","EVEN","EVER",
+  "EVIL","EXAM","FACE","FACT","FADE","FAIL","FAIR","FAKE","FALL","FAME","FANG",
+  "FARM","FAST","FATE","FAWN","FEAR","FEAT","FEEL","FEET","FELL","FELT","FERN",
+  "FILL","FILM","FIND","FINE","FIRE","FIRM","FISH","FIST","FLAG","FLAT","FLAW",
+  "FLEW","FLEX","FLIT","FLOW","FOAM","FOLD","FOLK","FONT","FOOD","FOOL","FOOT",
+  "FORD","FORE","FORK","FORM","FORT","FOUL","FOUR","FREE","FROM","FUEL","FULL",
+  "FUME","FUND","FURY","FUSE","FUZZ","GAIN","GALE","GALL","GAME","GARB","GAZE",
+  "GEAR","GIST","GIVE","GLAD","GLEE","GLOW","GLUE","GOAL","GOAD","GOLD","GOLF",
+  "GONE","GOOD","GORE","GOWN","GRAB","GRAM","GRAY","GREW","GREY","GRIN","GRIP",
+  "GRIT","GROW","GRUB","GULF","GULL","GUST","HACK","HAIL","HAIR","HALF","HALL",
+  "HALT","HAND","HANG","HARD","HARE","HARM","HARP","HASH","HATE","HAUL","HAWK",
+  "HEAD","HEAL","HEAP","HEAT","HEEL","HELM","HELP","HERB","HERD","HERE","HERO",
+  "HIGH","HIKE","HILL","HINT","HIRE","HIVE","HOAX","HOLD","HOLE","HOME","HOOD",
+  "HOOK","HOPE","HORN","HOST","HOUR","HOWL","HULL","HUNT","HURL","HURT","HUSH",
+  "IDOL","INCH","INFO","IRON","ISLE","ITEM","JABS","JADE","JAIL","JEST","JOIN",
+  "JOKE","JOLT","JUMP","JUNK","JURY","JUST","KEEN","KEEP","KICK","KILL","KIND",
+  "KING","KISS","KITE","KNOB","KNOT","KNOW","LACK","LAID","LAKE","LAME","LAND",
+  "LANE","LAST","LATE","LAUD","LAWN","LAZY","LEAD","LEAF","LEAK","LEAN","LEAP",
+  "LEFT","LEND","LENT","LENS","LESS","LEVY","LIAR","LICK","LIFE","LIFT","LIKE",
+  "LIME","LIMP","LINE","LINK","LION","LIST","LIVE","LOAD","LOAF","LOAN","LOCK",
+  "LONG","LOOK","LOOP","LORD","LORE","LOSE","LOSS","LURE","LURK","LUSH","MACE",
+  "MADE","MAIL","MAIN","MAKE","MALL","MALT","MANE","MANY","MARK","MARS","MAST",
+  "MATE","MATS","MEAD","MEAL","MEAN","MEAT","MEET","MELT","MEMO","MESH","MILD",
+  "MILK","MILL","MIME","MIND","MINE","MINT","MISS","MIST","MODE","MOLE","MONK",
+  "MOOD","MOON","MOOR","MOPE","MORE","MOST","MOTH","MOVE","MUCH","MULE","MUSE",
+  "MUST","MUTE","MYTH","NAIL","NAME","NEAR","NEAT","NECK","NEED","NEWS","NEXT",
+  "NINE","NODE","NONE","NOOK","NORM","NOSE","NOTE","NUDE","NULL","NUMB","OATH",
+  "OBEY","ODDS","ONCE","ONLY","OOZE","OPEN","OVAL","OVEN","OVER","OWNS","PACE",
+  "PACK","PAGE","PAID","PAIN","PAIR","PALM","PANG","PANT","PARK","PART","PASS",
+  "PAST","PATH","PAVE","PAWN","PEAK","PEAR","PEEL","PEER","PELT","PICK","PILE",
+  "PILL","PINE","PINK","PIPE","PLAN","PLAY","PLOD","PLOT","PLOW","PLOY","PLUM",
+  "PLUS","POEM","POET","POLE","POLL","POND","PORE","PORK","PORT","POSE","POST",
+  "POUR","PREY","PRIM","PROP","PULL","PUMP","PURE","PUSH","RACK","RAGE","RAID",
+  "RAIL","RAIN","RAKE","RAMP","RANG","RANK","RANT","RASH","RATE","READ","REAL",
+  "REAP","REED","REEL","RELY","REND","RENT","REST","RICE","RICH","RIDE","RIFE",
+  "RIND","RING","RIOT","RISE","RISK","ROAM","ROAR","ROBE","ROCK","ROLE","ROLL",
+  "ROOF","ROOM","ROOT","ROPE","ROSE","ROUT","RUBY","RUDE","RUIN","RULE","RUSH",
+  "RUST","SAFE","SAGE","SAIL","SAKE","SALT","SAME","SAND","SANE","SANG","SANK",
+  "SAVE","SCAN","SCAR","SEAL","SEAM","SELF","SELL","SHED","SHIP","SHOP","SHOT",
+  "SHOW","SICK","SIDE","SIGH","SILK","SILL","SING","SIRE","SITE","SIZE","SKIN",
+  "SKIP","SLAB","SLAM","SLAP","SLIM","SLIP","SLOT","SLOW","SLUG","SNAP","SNOW",
+  "SOAK","SOAR","SOCK","SOFT","SOIL","SOLD","SOLE","SOME","SONG","SOON","SORT",
+  "SOUL","SOUP","SOUR","SPAN","SPAR","SPIN","SPIT","SPOT","SPUR","STAR","STAY",
+  "STEM","STEP","STEW","STIR","STOP","STUB","STUN","SUCH","SUIT","SWAM","SWAN",
+  "SWAP","SWAT","SWIM","TALE","TALK","TALL","TAME","TACK","TANK","TASK","TAUT",
+  "TEAK","TEAL","TEAR","TELL","TEND","TENT","TERM","TEST","TEXT","THAN","THAT",
+  "THEM","THEN","THEY","THIN","THIS","THORN","TIDE","TIED","TIER","TILL","TILT",
+  "TIME","TOAD","TOLD","TOLL","TOMB","TONE","TONG","TOOL","TORE","TORN","TOSS",
+  "TOIL","TOWN","TRAM","TRAP","TRAY","TREE","TREK","TRIM","TRIP","TROD","TROT",
+  "TROY","TRUE","TUBE","TUNE","TURF","TURN","TUSK","TWIN","TYPE","UGLY","UNDO",
+  "UNIT","UNTO","UPON","URGE","USED","USER","VAIN","VALE","VANE","VAST","VEIL",
+  "VERB","VERY","VEST","VILE","VINE","VOID","VOLE","VOTE","WADE","WAGE","WAKE",
+  "WALK","WALL","WAND","WANT","WARD","WARM","WARP","WART","WASP","WAVE","WEAK",
+  "WEAN","WEED","WELL","WELT","WENT","WERE","WEST","WHAT","WHEN","WHIM","WHIP",
+  "WIDE","WIFE","WILD","WILL","WILT","WIND","WINE","WING","WINK","WIRE","WISE",
+  "WISH","WITH","WOLF","WOOD","WOOL","WORD","WORE","WORK","WORM","WORN","WRAP",
+  "WREN","WRIT","YARD","YARN","YELL","YOGA","YOGI","YOLK","YOUR","ZEAL","ZERO",
+  "ZONE","ZOOM"
+]);
+
+// Slang & profanity word list with bonus flags
+const SLANG_WORDS = new Set([
+  "ASS","ARSE","DAMN","HELL","CRAP","FART","POOP","TURD","PISS","PUKE",
+  "BITCH","BOOBS","BONER","BUTT","BUTTS","CUSS","DICK","DICK","DORK",
+  "DUMB","FART","FOUL","FOOL","GEEK","HACK","HECK","JERK","LAME","NERD",
+  "NUDE","POOP","PUTZ","RUMP","SCUM","SKANK","SLOB","SLUG","TWIT","WUSS",
+  "BIMBO","BOOZE","CHUMP","DIPSY","DWEEB","FLAKE","GOOFY","GRIME","GRIPE",
+  "GROSS","DOPEY","LOUSY","MOOCH","MOUSY","NERDY","NINNY","PANSY","SEEDY",
+  "SLEAZY","WIMPY","WACKO","TACKY","SAPPY","SKANKY","SKETCHY","SLOPPY",
+  "SCHMUCK","BLABBER","BLUNDER","BONEHEAD","BOZO","BUMBLE","BUNGLE",
+  "CRUD","CRUMMY","CRUSTY","DINKY","DIPPY","DITZY","DOOZY","DOPEY",
+  "FLAKY","FLOP","FLUNK","FREAK","FUNKY","GAWKY","GOOFY","GOOBER",
+  "GOOBERS","GRODY","GRUNGY","GUTSY","HAIRY","LOCO","LOOPY","LUMPY",
+  "MANGY","MESSY","MOUTHY","MUGGY","MUSTY","NASTY","NITTY","NUTTY",
+  "PERVY","PUNY","QUIRKY","RATTY","RUSTY","SCUZZY","SEEDY","SHADY",
+  "SHIFTY","SHODDY","SLIMY","SMARMY","SMELLY","SMUTTY","SNOBBY","SNOOTY",
+  "SNOT","SNOOTY","TACKY","TAWDRY","TRASHY","TRICKY","TRITE","TUBBY",
+  "VAPID","VULGAR","WHINY","WOOZY","ZANY","SLEAZE","SLIME",
+  // Modern slang
+  "YEET","SLAY","VIBE","FLEX","CLOUT","DRIP","LOWKEY","GOAT","LIT",
+  "FAM","BRO","SIS","TEA","SUSS","SALTY","SHADE","SHOOK","FINESSE",
+  "SLAPS","BUSSIN","RIZZ","THICC","WOKE","SIMP","THOT","STAN","CLAP",
+  "BANGER","BADDIE","BASIC","BEAST","BOUGIE","CLAPBACK","DEADASS",
+  "EXTRA","FACTS","FIRE","FOMO","FLOSSY","GHOSTED","GUCCI","HIGHKEY",
+  "HYPE","JUICED","KAREN","LEGIT","LEWK","MOOD","NO CAP","OOMF","PLUG",
+  "PRESSED","RATIO","RATCHET","RECEIPTS","RENT","SAVAGE","SECURED",
+  "SHEESH","SKSKSK","SLAPS","SNAPS","SNATCHED","SWAG","SWOLE","TURNT",
+  "UNDERSTOOD","VALID","VIBE","VIBEY","VIBING","WEIRDLY","YAS","YEETED",
+  "ZADDY","ZESTY","CHEUGY","LEWK","MID","NPC","SLAY","UNDERSTOOD",
+  "PRESSED","BUSSIN","RIZZY","GYAT","BASED","CRINGE","DRIPPY",
+  // More swears (keeping it spicy but not the absolute worst)
+  "BITCHY","BASTARD","DIPSHIT","JACKASS","DUMBASS","BULLSHIT","ASSHAT",
+  "DINGBAT","DIMWIT","MORON","IDIOT","DOOFUS","NITWIT","HALFWIT",
+  "NUMBSKULL","MEATHEAD","KNUCKLEHEAD","BLOCKHEAD","PINHEAD","AIRHEAD"
+]);
+
+// Words that get bonus points (profanity/slang bonus)
+const BONUS_WORDS = new Set([
+  "ASS","ARSE","DAMN","HELL","CRAP","FART","POOP","TURD","PISS","PUKE",
+  "BITCH","BASTARD","DIPSHIT","JACKASS","DUMBASS","BULLSHIT","ASSHAT",
+  "YEET","SLAY","RIZZ","BUSSIN","GYAT","THICC","DRIP","CLOUT","FLEX",
+  "SLAPS","BANGER","BADDIE","SAVAGE","SNATCHED","TURNT","SWOLE","ZADDY",
+  "SHEESH","DEADASS","PRESSED","RATCHET","SALTY","SHOOK","FINESSE",
+  "BITCHY","DINGBAT","MORON","DOOFUS","MEATHEAD","BLOCKHEAD","AIRHEAD",
+  "SLEAZE","SLIME","SCUM","SKANK","SMUTTY","SLEAZY","TRASHY","VULGAR",
+  "CHUMP","SCHMUCK","BOZO","DIPSY","GRODY","LOOPY","NUTTY","WACKO",
+  "SMARMY","SLIMY","SHADY","SEEDY","SKETCHY","LOWKEY","HIGHKEY",
+  "KNUCKLEHEAD","NUMBSKULL","PINHEAD","HALFWIT","DIMWIT","NITWIT"
+]);
+
+const ALL_WORDS = new Set([...STANDARD_WORDS, ...SLANG_WORDS]);
+
+// ============================================================
+// BOARD LAYOUT
+// ============================================================
+const BOARD_SIZE = 15;
+const CENTER = 7;
+
+// Premium squares
+const TW_SQUARES = new Set([0,7,14,105,119,210,217,224].map(String));
+const DW_SQUARES = new Set([16,28,32,42,48,56,64,70,154,160,168,176,182,192,196,208].map(String));
+const TL_SQUARES = new Set([20,24,76,80,84,88,136,140,144,148,100,104,116,120].map(String));
+const DL_SQUARES = new Set([3,11,36,38,45,52,59,92,96,98,102,108,112,122,129,132,165,172,179,186,189,213,221].map(String));
+// Bonus "crass squares" — land here and play a slang/swear word for +10
+const BONUS_SQUARES = new Set([18,26,38,66,90,102,122,134,158,186,198,206].map(String));
+
+// ============================================================
+// TRASH TALK
+// ============================================================
+const TRASH_TALK = {
+  goodWord: [
+    "Holy {bleep}, {player} actually knows words! Mom must be proud.",
+    "{player} spelled that like a DEGENERATE SCHOLAR. Disgusting. Impressive.",
+    "Look at {player} flexing their filthy vocabulary. Pathetic... and kind of hot.",
+    "{player} just committed a crime against the dictionary and I'm HERE for it.",
+    "Did {player} just... READ? In THIS economy?? Unbelievable.",
+    "Nobody asked for {player}'s literacy to be this aggressive. Yet here we are.",
+    "{player} playing chess while everyone else is playing Go Fish. Gross.",
+    "The audacity of {player}. The SHEER audacity. Incredible.",
+    "{player} out here treating tiles like they owe them money. Ruthless.",
+    "If brains were dynamite, {player} could actually blow something up. Barely.",
+  ],
+  bonusWord: [
+    "🤬 NASTY WORD BONUS! {player} said the quiet part loud AND got points for it. Respect.",
+    "🔥 {player} played a FILTHY word and the universe rewarded them. This game is perfect.",
+    "💀 OH WOW. {player} just said that. In front of EVERYONE. Bonus points well earned.",
+    "🤣 {player} didn't come to play nice. They came to WIN and to offend. Hall of fame.",
+    "😤 The audacity of {player} spelling that out with TILES. Chaotic evil. We love it.",
+  ],
+  badWord: [
+    "{player} played THAT? My goldfish could do better and it's been dead since 2018.",
+    "Is {player} okay? That word looks like their keyboard tripped and fell.",
+    "{player} just proved that literacy is indeed a spectrum. Bless their heart.",
+    "I've seen better words in a bowl of alphabet soup — and I dropped it on the floor.",
+    "{player}'s playing like they learned English from fortune cookies. Questionable choices.",
+    "Oof. {player} playing like they have places to be. Somewhere else. Clearly.",
+  ],
+  pass: [
+    "{player} PASSED? In THIS game? The cowardice. The absolute cowardice.",
+    "{player} passed like a student who didn't study. We know. We ALL know.",
+    "Skipped turn? {player} said 'I have nothing to offer' and honestly... same.",
+    "{player} passed and somewhere a Scrabble dictionary just shed a tear.",
+  ],
+  highScore: [
+    "{player} is DESTROYING it. Someone call the tile police.",
+    "{player} on a rampage. This is not okay. This is absolutely okay.",
+    "{player} up big. The other player should consider switching hobbies.",
+  ]
+};
+
+function getTrashTalk(type, playerName, otherName) {
+  const arr = TRASH_TALK[type] || TRASH_TALK.goodWord;
+  const line = arr[Math.floor(Math.random() * arr.length)];
+  return line.replace(/{player}/g, playerName).replace(/{other}/g, otherName || 'the other one');
+}
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let G = null; // game state object
+
+function initState(p1, p2) {
+  const bag = buildBag();
+  const rack1 = drawTiles(bag, 7);
+  const rack2 = drawTiles(bag, 7);
+  return {
+    p1, p2,
+    scores: [0, 0],
+    board: Array(BOARD_SIZE * BOARD_SIZE).fill(null),
+    bag,
+    racks: [rack1, rack2],
+    currentPlayer: 0,
+    passCount: 0,
+    turnCount: 0,
+    lastTrash: "Game on. May the filthiest vocabulary win.",
+    gameOver: false,
+    version: 2
+  };
+}
+
+function buildBag() {
+  const bag = [];
+  for (const [letter, data] of Object.entries(TILE_DATA)) {
+    for (let i = 0; i < data.count; i++) bag.push(letter);
+  }
+  // Shuffle
+  for (let i = bag.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [bag[i], bag[j]] = [bag[j], bag[i]];
+  }
+  return bag;
+}
+
+function drawTiles(bag, count) {
+  return bag.splice(0, Math.min(count, bag.length));
+}
+
+// ============================================================
+// URL STATE ENCODING
+// ============================================================
+function encodeState(state) {
+  try {
+    const json = JSON.stringify(state);
+    const encoded = btoa(encodeURIComponent(json));
+    return encoded;
+  } catch(e) { return ''; }
+}
+
+function decodeState(encoded) {
+  try {
+    const json = decodeURIComponent(atob(encoded));
+    return JSON.parse(json);
+  } catch(e) { return null; }
+}
+
+function getStateFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const data = params.get('g');
+  if (!data) return null;
+  return decodeState(data);
+}
+
+function buildShareURL(state) {
+  const encoded = encodeState(state);
+  const base = window.location.origin + window.location.pathname;
+  return `${base}?g=${encoded}`;
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+let selectedTileIdx = null;
+let placedThisTurn = []; // [{cellIdx, letter, isBlank, originalLetter}]
+
+function renderBoard() {
+  const boardEl = document.getElementById('board');
+  boardEl.innerHTML = '';
+  for (let i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.dataset.idx = i;
+
+    const tile = G.board[i];
+    if (tile) {
+      cell.classList.add('has-tile');
+      const isPlaced = placedThisTurn.find(p => p.cellIdx === i);
+      if (isPlaced) cell.classList.add('placed-this-turn');
+      cell.innerHTML = `${tile.letter}<span class="tile-score">${TILE_DATA[tile.original || tile.letter]?.val || 0}</span>`;
+    } else {
+      // Premium squares
+      const key = String(i);
+      if (i === CENTER) { cell.classList.add('star'); cell.textContent = '★'; }
+      else if (TW_SQUARES.has(key)) { cell.classList.add('tw'); cell.textContent = 'TW'; }
+      else if (DW_SQUARES.has(key)) { cell.classList.add('dw'); cell.textContent = 'DW'; }
+      else if (TL_SQUARES.has(key)) { cell.classList.add('tl'); cell.textContent = 'TL'; }
+      else if (DL_SQUARES.has(key)) { cell.classList.add('dl'); cell.textContent = 'DL'; }
+      else if (BONUS_SQUARES.has(key)) { cell.classList.add('bonus-sq'); cell.textContent = '🤬'; }
+
+      cell.addEventListener('click', () => handleCellClick(i));
+    }
+
+    boardEl.appendChild(cell);
+  }
+}
+
+function renderRack() {
+  const rackEl = document.getElementById('rack');
+  rackEl.innerHTML = '';
+  const rack = G.racks[G.currentPlayer];
+  rack.forEach((letter, idx) => {
+    const tile = document.createElement('div');
+    tile.className = 'rack-tile' + (letter === '_' ? ' blank-tile' : '');
+    tile.dataset.idx = idx;
+    const val = TILE_DATA[letter]?.val || 0;
+    tile.innerHTML = `${letter === '_' ? '?' : letter}<span class="tile-pts">${val}</span>`;
+    if (idx === selectedTileIdx) tile.classList.add('selected');
+    tile.addEventListener('click', () => handleTileSelect(idx));
+    rackEl.appendChild(tile);
+  });
+}
+
+function renderScores() {
+  document.getElementById('sc-p1-name').textContent = G.p1;
+  document.getElementById('sc-p2-name').textContent = G.p2;
+  document.getElementById('sc-p1-val').textContent = G.scores[0];
+  document.getElementById('sc-p2-val').textContent = G.scores[1];
+  document.getElementById('sc-p1').classList.toggle('active', G.currentPlayer === 0);
+  document.getElementById('sc-p2').classList.toggle('active', G.currentPlayer === 1);
+}
+
+function renderStatus() {
+  const name = G.currentPlayer === 0 ? G.p1 : G.p2;
+  document.getElementById('turn-indicator').textContent = `${name}'s rack`;
+  document.getElementById('bag-count').textContent = ` · 📦 ${G.bag.length} tiles left`;
+  document.getElementById('status-bar').textContent = `🎮 ${name}'s turn · Turn ${G.turnCount + 1}`;
+  document.getElementById('trash-talk-text').textContent = G.lastTrash;
+}
+
+function renderAll() {
+  renderBoard();
+  renderRack();
+  renderScores();
+  renderStatus();
+}
+
+// ============================================================
+// INTERACTIONS
+// ============================================================
+function handleTileSelect(idx) {
+  const rack = G.racks[G.currentPlayer];
+  const letter = rack[idx];
+  if (letter === '_') {
+    // blank tile — pick letter first via modal
+    selectedTileIdx = idx;
+    showBlankPicker();
+    return;
+  }
+  selectedTileIdx = (selectedTileIdx === idx) ? null : idx;
+  renderRack();
+}
+
+function handleCellClick(cellIdx) {
+  if (selectedTileIdx === null) return;
+  if (G.board[cellIdx]) return; // occupied
+  // Check if already placed this turn here
+  if (placedThisTurn.find(p => p.cellIdx === cellIdx)) return;
+
+  const rack = G.racks[G.currentPlayer];
+  const letter = rack[selectedTileIdx];
+
+  // Place tile
+  G.board[cellIdx] = { letter, original: letter };
+  placedThisTurn.push({ cellIdx, letter, isBlank: false, originalLetter: letter });
+  rack.splice(selectedTileIdx, 1);
+  selectedTileIdx = null;
+
+  renderAll();
+}
+
+function showBlankPicker() {
+  const picker = document.getElementById('blank-picker');
+  picker.innerHTML = '';
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'blank-option';
+    btn.textContent = l;
+    btn.onclick = () => {
+      closeModal('blank-modal');
+      placeBlanktile(l);
+    };
+    picker.appendChild(btn);
+  });
+  document.getElementById('blank-modal').classList.add('open');
+}
+
+function placeBlanktile(chosenLetter) {
+  // selectedTileIdx already set
+  const rack = G.racks[G.currentPlayer];
+  // Show board — user now needs to click a cell
+  // We replace blank in rack temporarily with chosen letter marker
+  rack[selectedTileIdx] = `${chosenLetter}*`; // mark as blank
+  renderRack();
+  // Highlight valid cells
+  document.querySelectorAll('.cell:not(.has-tile)').forEach(c => c.classList.add('highlight'));
+  // Override cell click to handle blank
+  document.getElementById('board').addEventListener('click', function blankClickHandler(e) {
+    const cell = e.target.closest('.cell');
+    if (!cell || cell.classList.contains('has-tile')) return;
+    const cellIdx = parseInt(cell.dataset.idx);
+    document.getElementById('board').removeEventListener('click', blankClickHandler);
+    document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight'));
+
+    G.board[cellIdx] = { letter: chosenLetter, original: '_' };
+    placedThisTurn.push({ cellIdx, letter: chosenLetter, isBlank: true, originalLetter: '_' });
+    rack.splice(selectedTileIdx, 1);
+    selectedTileIdx = null;
+    renderAll();
+  }, { once: false });
+}
+
+function recallTiles() {
+  placedThisTurn.forEach(({ cellIdx, originalLetter }) => {
+    G.board[cellIdx] = null;
+    G.racks[G.currentPlayer].push(originalLetter);
+  });
+  placedThisTurn = [];
+  selectedTileIdx = null;
+  renderAll();
+}
+
+function shuffleRack() {
+  const rack = G.racks[G.currentPlayer];
+  for (let i = rack.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [rack[i], rack[j]] = [rack[j], rack[i]];
+  }
+  renderRack();
+}
+
+// ============================================================
+// WORD VALIDATION & SCORING
+// ============================================================
+function getPlacedWord() {
+  if (placedThisTurn.length === 0) return null;
+
+  const indices = placedThisTurn.map(p => p.cellIdx).sort((a,b) => a-b);
+  const rows = indices.map(i => Math.floor(i / BOARD_SIZE));
+  const cols = indices.map(i => i % BOARD_SIZE);
+
+  const allSameRow = rows.every(r => r === rows[0]);
+  const allSameCol = cols.every(c => c === cols[0]);
+
+  if (!allSameRow && !allSameCol) return null; // not in a line
+
+  // Get full word (including existing tiles)
+  let wordCells = [];
+  if (allSameRow) {
+    const row = rows[0];
+    const minCol = Math.min(...cols);
+    const maxCol = Math.max(...cols);
+    for (let c = minCol; c <= maxCol; c++) {
+      const idx = row * BOARD_SIZE + c;
+      if (!G.board[idx]) return null; // gap
+      wordCells.push(idx);
+    }
+    // Extend left/right
+    let c = minCol - 1;
+    while (c >= 0 && G.board[row * BOARD_SIZE + c]) { wordCells.unshift(row * BOARD_SIZE + c); c--; }
+    c = maxCol + 1;
+    while (c < BOARD_SIZE && G.board[row * BOARD_SIZE + c]) { wordCells.push(row * BOARD_SIZE + c); c++; }
+  } else {
+    const col = cols[0];
+    const minRow = Math.min(...rows);
+    const maxRow = Math.max(...rows);
+    for (let r = minRow; r <= maxRow; r++) {
+      const idx = r * BOARD_SIZE + col;
+      if (!G.board[idx]) return null;
+      wordCells.push(idx);
+    }
+    let r = minRow - 1;
+    while (r >= 0 && G.board[r * BOARD_SIZE + col]) { wordCells.unshift(r * BOARD_SIZE + col); r--; }
+    r = maxRow + 1;
+    while (r < BOARD_SIZE && G.board[r * BOARD_SIZE + col]) { wordCells.push(r * BOARD_SIZE + col); r++; }
+  }
+
+  const word = wordCells.map(i => G.board[i].letter).join('');
+  return { word, cells: wordCells };
+}
+
+function getCrossWords() {
+  // For each placed tile, check perpendicular words
+  const crossWords = [];
+  for (const placed of placedThisTurn) {
+    const { cellIdx } = placed;
+    const row = Math.floor(cellIdx / BOARD_SIZE);
+    const col = cellIdx % BOARD_SIZE;
+
+    // Check vertical
+    let cells = [cellIdx];
+    let r = row - 1;
+    while (r >= 0 && G.board[r * BOARD_SIZE + col]) { cells.unshift(r * BOARD_SIZE + col); r--; }
+    r = row + 1;
+    while (r < BOARD_SIZE && G.board[r * BOARD_SIZE + col]) { cells.push(r * BOARD_SIZE + col); r++; }
+    if (cells.length > 1) {
+      const word = cells.map(i => G.board[i].letter).join('');
+      crossWords.push({ word, cells });
+    }
+
+    // Check horizontal
+    cells = [cellIdx];
+    let c = col - 1;
+    while (c >= 0 && G.board[row * BOARD_SIZE + c]) { cells.unshift(row * BOARD_SIZE + c); c--; }
+    c = col + 1;
+    while (c < BOARD_SIZE && G.board[row * BOARD_SIZE + c]) { cells.push(row * BOARD_SIZE + c); c++; }
+    if (cells.length > 1) {
+      const word = cells.map(i => G.board[i].letter).join('');
+      // Avoid adding the main word again
+      if (!crossWords.find(cw => cw.word === word && JSON.stringify(cw.cells) === JSON.stringify(cells))) {
+        crossWords.push({ word, cells });
+      }
+    }
+  }
+  return crossWords;
+}
+
+function scoreCells(cells, newCells) {
+  let letterSum = 0;
+  let wordMult = 1;
+  let bonusSquareHit = false;
+
+  for (const cellIdx of cells) {
+    const tile = G.board[cellIdx];
+    const letterVal = TILE_DATA[tile.original || tile.letter]?.val || 0;
+    const key = String(cellIdx);
+    const isNew = newCells.has(cellIdx);
+
+    let lv = letterVal;
+    if (isNew) {
+      if (TL_SQUARES.has(key)) lv *= 3;
+      else if (DL_SQUARES.has(key)) lv *= 2;
+      if (TW_SQUARES.has(key)) wordMult *= 3;
+      else if (DW_SQUARES.has(key) || cellIdx === CENTER) wordMult *= 2;
+      if (BONUS_SQUARES.has(key)) bonusSquareHit = true;
+    }
+    letterSum += lv;
+  }
+
+  return { score: letterSum * wordMult, bonusSquareHit };
+}
+
+function validateAndScore() {
+  if (placedThisTurn.length === 0) {
+    showStatus("❌ Place some tiles first, genius.");
+    return null;
+  }
+
+  // First move must cover center
+  const isFirstMove = G.turnCount === 0 && G.scores[0] === 0 && G.scores[1] === 0;
+  if (isFirstMove) {
+    const coversCenter = placedThisTurn.some(p => p.cellIdx === CENTER);
+    if (!coversCenter) {
+      showStatus("❌ First word must cover the center star! Come on.");
+      return null;
+    }
+  }
+
+  const mainWordResult = getPlacedWord();
+  if (!mainWordResult) {
+    showStatus("❌ Tiles must be in a straight line with no gaps, dingus.");
+    return null;
+  }
+
+  const { word: mainWord, cells: mainCells } = mainWordResult;
+
+  // Validate main word
+  if (!ALL_WORDS.has(mainWord.toUpperCase())) {
+    showStatus(`❌ "${mainWord}" isn't a word. Try harder.`);
+    return null;
+  }
+
+  // Must connect to existing tiles (unless first move)
+  if (!isFirstMove) {
+    const newCellSet = new Set(placedThisTurn.map(p => p.cellIdx));
+    const connects = mainCells.some(c => !newCellSet.has(c));
+    if (!connects) {
+      // Check if any placed tile is adjacent to an existing board tile
+      const adjacentToExisting = placedThisTurn.some(({ cellIdx }) => {
+        const row = Math.floor(cellIdx / BOARD_SIZE);
+        const col = cellIdx % BOARD_SIZE;
+        const neighbors = [
+          (row-1)*BOARD_SIZE+col, (row+1)*BOARD_SIZE+col,
+          row*BOARD_SIZE+(col-1), row*BOARD_SIZE+(col+1)
+        ];
+        return neighbors.some(n => n >= 0 && n < BOARD_SIZE*BOARD_SIZE && G.board[n] && !newCellSet.has(n));
+      });
+      if (!adjacentToExisting) {
+        showStatus("❌ Word must connect to existing tiles, dummy.");
+        return null;
+      }
+    }
+  }
+
+  const newCellSet = new Set(placedThisTurn.map(p => p.cellIdx));
+  let totalScore = 0;
+  let allWords = [mainWord];
+  let bonusHit = false;
+
+  // Score main word
+  const { score: mainScore, bonusSquareHit } = scoreCells(mainCells, newCellSet);
+  if (bonusSquareHit) bonusHit = true;
+  totalScore += mainScore;
+
+  // Cross words
+  const crossWordResults = getCrossWords();
+  for (const { word, cells } of crossWordResults) {
+    if (word === mainWord) continue;
+    if (!ALL_WORDS.has(word.toUpperCase())) {
+      showStatus(`❌ Cross word "${word}" isn't valid. Recall and retry.`);
+      return null;
+    }
+    allWords.push(word);
+    const { score: cScore } = scoreCells(cells, newCellSet);
+    totalScore += cScore;
+  }
+
+  // Bingo bonus (used all 7 tiles)
+  if (placedThisTurn.length === 7) totalScore += 50;
+
+  // Profanity/slang bonus
+  const nastyWords = allWords.filter(w => BONUS_WORDS.has(w.toUpperCase()));
+  const nastyBonus = nastyWords.length * 10;
+  totalScore += nastyBonus;
+
+  return { totalScore, allWords, nastyWords, nastyBonus, bonusHit };
+}
+
+// ============================================================
+// TURN ACTIONS
+// ============================================================
+function submitWord() {
+  const result = validateAndScore();
+  if (!result) return;
+
+  const { totalScore, allWords, nastyWords, nastyBonus } = result;
+  const playerName = G.currentPlayer === 0 ? G.p1 : G.p2;
+  const otherName = G.currentPlayer === 0 ? G.p2 : G.p1;
+
+  G.scores[G.currentPlayer] += totalScore;
+
+  // Trash talk
+  let trashType = 'goodWord';
+  if (nastyWords.length > 0) trashType = 'bonusWord';
+  else if (totalScore < 5) trashType = 'badWord';
+  else if (G.scores[G.currentPlayer] > G.scores[1 - G.currentPlayer] + 30) trashType = 'highScore';
+
+  G.lastTrash = getTrashTalk(trashType, playerName, otherName);
+
+  // Show bonus popup
+  if (nastyWords.length > 0) {
+    showBonusPopup(`🤬 +${nastyBonus} NASTY BONUS!\n${nastyWords.join(', ')}`);
+  } else if (placedThisTurn.length === 7) {
+    showBonusPopup('🎰 BINGO! +50 pts!');
+  } else {
+    showScoreFloat(`+${totalScore}`);
+  }
+
+  // Refill rack
+  const needed = 7 - G.racks[G.currentPlayer].length;
+  const drawn = drawTiles(G.bag, needed);
+  G.racks[G.currentPlayer].push(...drawn);
+
+  G.passCount = 0;
+  G.turnCount++;
+  placedThisTurn = [];
+  selectedTileIdx = null;
+
+  // Check game over
+  if (G.bag.length === 0 && G.racks[G.currentPlayer].length === 0) {
+    endGame();
+    return;
+  }
+
+  switchPlayer();
+}
+
+function passTurn() {
+  const playerName = G.currentPlayer === 0 ? G.p1 : G.p2;
+  recallTiles();
+  G.lastTrash = getTrashTalk('pass', playerName);
+  G.passCount++;
+  G.turnCount++;
+
+  if (G.passCount >= 4) {
+    endGame();
+    return;
+  }
+
+  switchPlayer();
+}
+
+function switchPlayer() {
+  G.currentPlayer = 1 - G.currentPlayer;
+  renderAll();
+}
+
+function endGame() {
+  G.gameOver = true;
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('gameover-screen').style.display = 'flex';
+
+  const winner = G.scores[0] > G.scores[1] ? 0 : (G.scores[1] > G.scores[0] ? 1 : -1);
+  const container = document.getElementById('final-scores');
+  container.innerHTML = '';
+
+  [G.p1, G.p2].forEach((name, i) => {
+    const card = document.createElement('div');
+    card.className = 'final-score-card' + (winner === i ? ' winner' : '');
+    card.innerHTML = `
+      ${winner === i ? '<div class="winner-crown">👑</div>' : ''}
+      <div class="score-name">${name}</div>
+      <div class="score-val" style="font-size:3rem;">${G.scores[i]}</div>
+      ${winner === i ? '<div style="color:var(--accent3);font-size:0.9rem;margin-top:0.5rem;">WINNER, WINNER, PROFANITY DINNER</div>' : ''}
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ============================================================
+// SHARE
+// ============================================================
+function showShareModal() {
+  // Include unplaced tiles back before sharing
+  recallTiles();
+  const url = buildShareURL(G);
+  document.getElementById('share-url-text').textContent = url;
+  document.getElementById('share-copied').style.display = 'none';
+  document.getElementById('share-modal').classList.add('open');
+}
+
+function copyShareUrl() {
+  const url = document.getElementById('share-url-text').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    document.getElementById('share-copied').style.display = 'block';
+    document.getElementById('share-url-text').textContent = url;
+  }).catch(() => {
+    // fallback
+    const el = document.createElement('textarea');
+    el.value = url;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    document.getElementById('share-copied').style.display = 'block';
+  });
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function showStatus(msg) {
+  document.getElementById('status-bar').textContent = msg;
+  setTimeout(() => renderStatus(), 3000);
+}
+
+function showBonusPopup(text) {
+  const el = document.createElement('div');
+  el.className = 'bonus-popup';
+  el.style.whiteSpace = 'pre-line';
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2000);
+}
+
+function showScoreFloat(text) {
+  const el = document.createElement('div');
+  el.className = 'word-score-badge';
+  el.textContent = text;
+  el.style.left = '50%';
+  el.style.top = '40%';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1500);
+}
+
+// ============================================================
+// STARTUP
+// ============================================================
+function startGame() {
+  const p1 = document.getElementById('p1name').value.trim() || 'Player 1';
+  const p2 = document.getElementById('p2name').value.trim() || 'Player 2';
+  G = initState(p1, p2);
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  renderAll();
+}
+
+function loadFromURL() {
+  const state = getStateFromURL();
+  if (state && state.version === 2) {
+    G = state;
+    placedThisTurn = [];
+    selectedTileIdx = null;
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'block';
+    renderAll();
+    return true;
+  }
+  return false;
+}
+
+window.addEventListener('load', () => {
+  if (!loadFromURL()) {
+    document.getElementById('setup-screen').style.display = 'flex';
+  }
+
+  // Enter key for setup
+  document.getElementById('p2name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') startGame();
+  });
+  document.getElementById('p1name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('p2name').focus();
+  });
+
+  // Close modals on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+  });
+});
+</script>
+</body>
+</html>
