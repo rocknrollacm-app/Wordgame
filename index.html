@@ -244,11 +244,11 @@ var PLACED = [];
 function buildBag() {
   var bag = [];
   var letters = Object.keys(TC);
-  for (var i = 0; i < letters.length; i++) {
+  for (var i = 0; i \u003C letters.length; i++) {
     var l = letters[i];
-    for (var j = 0; j < TC[l]; j++) bag.push(l);
+    for (var j = 0; j \u003C TC[l]; j++) bag.push(l);
   }
-  for (var i = bag.length - 1; i > 0; i--) {
+  for (var i = bag.length - 1; i \u003E 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
     var tmp = bag[i]; bag[i] = bag[j]; bag[j] = tmp;
   }
@@ -295,7 +295,7 @@ function makeURL(g) {
 function rBoard() {
   var el = document.getElementById('board');
   el.innerHTML = '';
-  for (var i = 0; i < BS * BS; i++) {
+  for (var i = 0; i \u003C BS * BS; i++) {
     var c = document.createElement('div');
     c.className = 'cell';
     c.setAttribute('data-i', i);
@@ -303,7 +303,7 @@ function rBoard() {
     if (tile) {
       c.className = 'cell ht';
       var isNew = false;
-      for (var k = 0; k < PLACED.length; k++) { if (PLACED[k].ci === i) { isNew = true; break; } }
+      for (var k = 0; k \u003C PLACED.length; k++) { if (PLACED[k].ci === i) { isNew = true; break; } }
       if (isNew) c.className = 'cell ht pt';
       var pts = TV[tile.o] !== undefined ? TV[tile.o] : (TV[tile.l] || 0);
       // Build tile HTML safely using DOM
@@ -333,7 +333,7 @@ function rRack() {
   var el = document.getElementById('rack');
   el.innerHTML = '';
   var rack = G.racks[G.cur];
-  for (var i = 0; i < rack.length; i++) {
+  for (var i = 0; i \u003C rack.length; i++) {
     var l = rack[i];
     var t = document.createElement('div');
     t.className = SEL === i ? 'rt sel' : 'rt';
@@ -387,10 +387,10 @@ function rPreview() {
   var bonusTxt = '';
   if (valid) {
     var ns = {};
-    for (var k = 0; k < PLACED.length; k++) ns[PLACED[k].ci] = true;
+    for (var k = 0; k \u003C PLACED.length; k++) ns[PLACED[k].ci] = true;
     total += scoreC(mw.cells, ns).score;
     var crosses = getCross();
-    for (var k = 0; k < crosses.length; k++) {
+    for (var k = 0; k \u003C crosses.length; k++) {
       var cw = crosses[k];
       if (cw.word === word) continue;
       if (WORDS[cw.word.toUpperCase()]) total += scoreC(cw.cells, ns).score;
@@ -418,7 +418,7 @@ function clickTile(i) {
 function clickCell(ci) {
   if (SEL === null) return;
   if (G.board[ci]) return;
-  for (var k = 0; k < PLACED.length; k++) { if (PLACED[k].ci === ci) return; }
+  for (var k = 0; k \u003C PLACED.length; k++) { if (PLACED[k].ci === ci) return; }
   var rack = G.racks[G.cur];
   var l = rack[SEL];
   G.board[ci] = {l: l, o: l};
@@ -432,7 +432,7 @@ function showBlank() {
   var pk = document.getElementById('bpk');
   pk.innerHTML = '';
   var letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-  for (var i = 0; i < letters.length; i++) {
+  for (var i = 0; i \u003C letters.length; i++) {
     var b = document.createElement('button');
     b.className = 'bo';
     b.textContent = letters[i];
@@ -455,15 +455,15 @@ function placeBlank(cl) {
   rack[SEL] = cl + '*';
   rRack();
   var cells = document.querySelectorAll('.cell:not(.ht)');
-  for (var k = 0; k < cells.length; k++) cells[k].className += ' hl';
+  for (var k = 0; k \u003C cells.length; k++) cells[k].className += ' hl';
   
   var handler = function(e) {
     var c = e.target.closest ? e.target.closest('.cell') : e.target;
-    if (!c || c.className.indexOf('ht') >= 0) return;
+    if (!c || c.className.indexOf('ht') \u003E= 0) return;
     var ci = parseInt(c.getAttribute('data-i'));
     document.getElementById('board').removeEventListener('click', handler);
     var allCells = document.querySelectorAll('.cell');
-    for (var k = 0; k < allCells.length; k++) {
+    for (var k = 0; k \u003C allCells.length; k++) {
       allCells[k].className = allCells[k].className.replace(' hl', '');
     }
     G.board[ci] = {l: cl, o: '_'};
@@ -476,7 +476,7 @@ function placeBlank(cl) {
 }
 
 function recallTiles() {
-  for (var k = 0; k < PLACED.length; k++) {
+  for (var k = 0; k \u003C PLACED.length; k++) {
     var p = PLACED[k];
     G.board[p.ci] = null;
     G.racks[G.cur].push(p.ol);
@@ -488,7 +488,7 @@ function recallTiles() {
 
 function shuffleRack() {
   var r = G.racks[G.cur];
-  for (var i = r.length - 1; i > 0; i--) {
+  for (var i = r.length - 1; i \u003E 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
     var tmp = r[i]; r[i] = r[j]; r[j] = tmp;
   }
@@ -498,60 +498,60 @@ function shuffleRack() {
 function getWord() {
   if (!PLACED.length) return null;
   var idx = [];
-  for (var k = 0; k < PLACED.length; k++) idx.push(PLACED[k].ci);
+  for (var k = 0; k \u003C PLACED.length; k++) idx.push(PLACED[k].ci);
   idx.sort(function(a,b){return a-b;});
   var rows = [], cols = [];
-  for (var k = 0; k < idx.length; k++) { rows.push(Math.floor(idx[k]/BS)); cols.push(idx[k]%BS); }
+  for (var k = 0; k \u003C idx.length; k++) { rows.push(Math.floor(idx[k]/BS)); cols.push(idx[k]%BS); }
   var sr = true, sc = true;
-  for (var k = 1; k < rows.length; k++) { if (rows[k] !== rows[0]) { sr = false; break; } }
-  for (var k = 1; k < cols.length; k++) { if (cols[k] !== cols[0]) { sc = false; break; } }
+  for (var k = 1; k \u003C rows.length; k++) { if (rows[k] !== rows[0]) { sr = false; break; } }
+  for (var k = 1; k \u003C cols.length; k++) { if (cols[k] !== cols[0]) { sc = false; break; } }
   if (!sr && !sc) return null;
   var wc = [];
   if (sr) {
     var row = rows[0], mn = cols[0], mx = cols[cols.length-1];
-    for (var c = mn; c <= mx; c++) {
+    for (var c = mn; c \u003C= mx; c++) {
       var ii = row*BS+c;
       if (!G.board[ii]) return null;
       wc.push(ii);
     }
-    var c = mn-1; while (c>=0 && G.board[row*BS+c]) { wc.unshift(row*BS+c); c--; }
-    c = mx+1; while (c<BS && G.board[row*BS+c]) { wc.push(row*BS+c); c++; }
+    var c = mn-1; while (c\u003E=0 && G.board[row*BS+c]) { wc.unshift(row*BS+c); c--; }
+    c = mx+1; while (c\u003CBS && G.board[row*BS+c]) { wc.push(row*BS+c); c++; }
   } else {
     var col = cols[0], mn = rows[0], mx = rows[rows.length-1];
-    for (var r = mn; r <= mx; r++) {
+    for (var r = mn; r \u003C= mx; r++) {
       var ii = r*BS+col;
       if (!G.board[ii]) return null;
       wc.push(ii);
     }
-    var r = mn-1; while (r>=0 && G.board[r*BS+col]) { wc.unshift(r*BS+col); r--; }
-    r = mx+1; while (r<BS && G.board[r*BS+col]) { wc.push(r*BS+col); r++; }
+    var r = mn-1; while (r\u003E=0 && G.board[r*BS+col]) { wc.unshift(r*BS+col); r--; }
+    r = mx+1; while (r\u003CBS && G.board[r*BS+col]) { wc.push(r*BS+col); r++; }
   }
   var word = '';
-  for (var k = 0; k < wc.length; k++) word += G.board[wc[k]].l;
+  for (var k = 0; k \u003C wc.length; k++) word += G.board[wc[k]].l;
   return {word: word, cells: wc};
 }
 
 function getCross() {
   var res = [];
-  for (var pi = 0; pi < PLACED.length; pi++) {
+  for (var pi = 0; pi \u003C PLACED.length; pi++) {
     var ci = PLACED[pi].ci;
     var row = Math.floor(ci/BS), col = ci%BS;
     // vertical
     var cells = [ci];
-    var r = row-1; while (r>=0 && G.board[r*BS+col]) { cells.unshift(r*BS+col); r--; }
-    r = row+1; while (r<BS && G.board[r*BS+col]) { cells.push(r*BS+col); r++; }
-    if (cells.length > 1) {
-      var w = ''; for (var k=0;k<cells.length;k++) w+=G.board[cells[k]].l;
+    var r = row-1; while (r\u003E=0 && G.board[r*BS+col]) { cells.unshift(r*BS+col); r--; }
+    r = row+1; while (r\u003CBS && G.board[r*BS+col]) { cells.push(r*BS+col); r++; }
+    if (cells.length \u003E 1) {
+      var w = ''; for (var k=0;k\u003Ccells.length;k++) w+=G.board[cells[k]].l;
       res.push({word:w, cells:cells});
     }
     // horizontal
     cells = [ci];
-    var c = col-1; while (c>=0 && G.board[row*BS+c]) { cells.unshift(row*BS+c); c--; }
-    c = col+1; while (c<BS && G.board[row*BS+c]) { cells.push(row*BS+c); c++; }
-    if (cells.length > 1) {
-      var w = ''; for (var k=0;k<cells.length;k++) w+=G.board[cells[k]].l;
+    var c = col-1; while (c\u003E=0 && G.board[row*BS+c]) { cells.unshift(row*BS+c); c--; }
+    c = col+1; while (c\u003CBS && G.board[row*BS+c]) { cells.push(row*BS+c); c++; }
+    if (cells.length \u003E 1) {
+      var w = ''; for (var k=0;k\u003Ccells.length;k++) w+=G.board[cells[k]].l;
       var dup = false;
-      for (var k=0;k<res.length;k++) { if (res[k].word===w) { dup=true; break; } }
+      for (var k=0;k\u003Cres.length;k++) { if (res[k].word===w) { dup=true; break; } }
       if (!dup) res.push({word:w, cells:cells});
     }
   }
@@ -560,7 +560,7 @@ function getCross() {
 
 function scoreC(cells, ns) {
   var sum = 0, wm = 1;
-  for (var k = 0; k < cells.length; k++) {
+  for (var k = 0; k \u003C cells.length; k++) {
     var i = cells[k];
     var tile = G.board[i];
     var lv = TV[tile.o] !== undefined ? TV[tile.o] : (TV[tile.l] || 0);
@@ -583,7 +583,7 @@ function submitWord() {
   if (!PLACED.length) { setStatus('Place some tiles first.'); return; }
   var isFirst = G.turn === 0 && !G.scores[0] && !G.scores[1];
   var hasCenter = false;
-  for (var k=0;k<PLACED.length;k++) { if (PLACED[k].ci===CTR) { hasCenter=true; break; } }
+  for (var k=0;k\u003CPLACED.length;k++) { if (PLACED[k].ci===CTR) { hasCenter=true; break; } }
   if (isFirst && !hasCenter) { setStatus('First word must cover the center star.'); return; }
   var mw = getWord();
   if (!mw) { setStatus('Tiles must be in a straight line with no gaps.'); return; }
@@ -591,17 +591,17 @@ function submitWord() {
   if (!WORDS[word.toUpperCase()]) { setStatus('"' + word + '" is not a word. Try harder.'); return; }
   if (!isFirst) {
     var ns = {};
-    for (var k=0;k<PLACED.length;k++) ns[PLACED[k].ci]=true;
+    for (var k=0;k\u003CPLACED.length;k++) ns[PLACED[k].ci]=true;
     var connects = false;
-    for (var k=0;k<mw.cells.length;k++) { if (!ns[mw.cells[k]]) { connects=true; break; } }
+    for (var k=0;k\u003Cmw.cells.length;k++) { if (!ns[mw.cells[k]]) { connects=true; break; } }
     if (!connects) {
       var adj = false;
-      for (var pi=0;pi<PLACED.length;pi++) {
+      for (var pi=0;pi\u003CPLACED.length;pi++) {
         var ci=PLACED[pi].ci, row=Math.floor(ci/BS), col=ci%BS;
         var nbrs=[ci-BS,ci+BS,ci-1,ci+1];
-        for (var k=0;k<nbrs.length;k++) {
+        for (var k=0;k\u003Cnbrs.length;k++) {
           var n=nbrs[k];
-          if (n>=0 && n<BS*BS && G.board[n] && !ns[n]) { adj=true; break; }
+          if (n\u003E=0 && n\u003CBS*BS && G.board[n] && !ns[n]) { adj=true; break; }
         }
         if (adj) break;
       }
@@ -609,11 +609,11 @@ function submitWord() {
     }
   }
   var ns = {};
-  for (var k=0;k<PLACED.length;k++) ns[PLACED[k].ci]=true;
+  for (var k=0;k\u003CPLACED.length;k++) ns[PLACED[k].ci]=true;
   var total = scoreC(mw.cells, ns).score;
   var allW = [word], nasty = [];
   var crosses = getCross();
-  for (var k=0;k<crosses.length;k++) {
+  for (var k=0;k\u003Ccrosses.length;k++) {
     var cw=crosses[k];
     if (cw.word===word) continue;
     if (!WORDS[cw.word.toUpperCase()]) { setStatus('"'+cw.word+'" is not valid. Recall and retry.'); return; }
@@ -621,15 +621,15 @@ function submitWord() {
     total += scoreC(cw.cells, ns).score;
   }
   if (PLACED.length===7) total+=50;
-  for (var k=0;k<allW.length;k++) { if (BONUS_WORDS[allW[k].toUpperCase()]) nasty.push(allW[k]); }
+  for (var k=0;k\u003CallW.length;k++) { if (BONUS_WORDS[allW[k].toUpperCase()]) nasty.push(allW[k]); }
   total += nasty.length * 10;
 
   var pn = G.cur===0?G.p1:G.p2, on = G.cur===0?G.p2:G.p1;
   G.scores[G.cur] += total;
   var ttype = 'good';
   if (nasty.length) ttype='nasty';
-  else if (total<5) ttype='bad';
-  else if (G.scores[G.cur] > G.scores[1-G.cur]+30) ttype='hot';
+  else if (total\u003C5) ttype='bad';
+  else if (G.scores[G.cur] \u003E G.scores[1-G.cur]+30) ttype='hot';
   G.lastMsg = tt(ttype, pn, on);
   if (nasty.length) showPopup('NASTY BONUS +' + (nasty.length*10) + '
 ' + nasty.join(', '));
@@ -637,7 +637,7 @@ function submitWord() {
   else showFloat('+' + total);
   var needed = 7 - G.racks[G.cur].length;
   var drawn = drawN(G.bag, needed);
-  for (var k=0;k<drawn.length;k++) G.racks[G.cur].push(drawn[k]);
+  for (var k=0;k\u003Cdrawn.length;k++) G.racks[G.cur].push(drawn[k]);
   G.passes=0; G.turn++;
   PLACED=[]; SEL=null;
   if (G.bag.length===0 && G.racks[G.cur].length===0) { endGame(); return; }
@@ -650,7 +650,7 @@ function passTurn() {
   var pn = G.cur===0?G.p1:G.p2;
   G.lastMsg = tt('pass', pn);
   G.passes++; G.turn++;
-  if (G.passes>=4) { endGame(); return; }
+  if (G.passes\u003E=4) { endGame(); return; }
   G.cur = 1-G.cur;
   rAll();
 }
@@ -659,11 +659,11 @@ function endGame() {
   G.over = true;
   document.getElementById('game').style.display = 'none';
   document.getElementById('go').style.display = 'flex';
-  var w = G.scores[0]>G.scores[1] ? 0 : (G.scores[1]>G.scores[0] ? 1 : -1);
+  var w = G.scores[0]\u003EG.scores[1] ? 0 : (G.scores[1]\u003EG.scores[0] ? 1 : -1);
   var c = document.getElementById('fscores');
   c.innerHTML = '';
   var names = [G.p1, G.p2];
-  for (var i=0;i<2;i++) {
+  for (var i=0;i\u003C2;i++) {
     var d = document.createElement('div');
     d.className = w===i ? 'fsc win' : 'fsc';
     var crown = document.createElement('div');
@@ -750,7 +750,7 @@ window.addEventListener('load', function() {
   document.getElementById('p1').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('p2').focus(); });
   document.getElementById('p2').addEventListener('keydown', function(e){ if(e.key==='Enter') startGame(); });
   var overlays = document.querySelectorAll('.mo');
-  for (var i=0;i<overlays.length;i++) {
+  for (var i=0;i\u003Coverlays.length;i++) {
     overlays[i].addEventListener('click', function(e){ if(e.target===this) this.className='mo'; });
   }
 });
