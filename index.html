@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tilesworth McGee's Profanity Emporium</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,serif;background:#1c1814;color:#e8dcc8;min-height:100vh}
+#setup{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;text-align:center}
+.logo{font-size:clamp(1.8rem,6vw,3.2rem);font-weight:bold;color:#d4a843;margin-bottom:.4rem;line-height:1.2;text-shadow:2px 2px 0 rgba(0,0,0,.6)}
+.tag{color:#7a6e62;font-style:italic;margin-bottom:1.5rem;font-size:.9rem}
+.card{background:#242018;border:1px solid #b8892a;border-radius:4px;padding:1.8rem;max-width:360px;width:100%}
+.card h2{font-size:1rem;margin-bottom:1rem;color:#b8892a;letter-spacing:1px}
+.ig{margin-bottom:.8rem}
+.ig label{display:block;font-size:.65rem;font-weight:bold;text-transform:uppercase;letter-spacing:2px;color:#7a6e62;margin-bottom:.25rem}
+.ig input{width:100%;padding:.6rem .85rem;background:#1c1814;border:1px solid #3d3530;border-radius:2px;color:#e8dcc8;font-size:.95rem;font-family:Georgia,serif;outline:none}
+.ig input:focus{border-color:#b8892a}
+.sbtn{width:100%;margin-top:1rem;padding:.75rem;background:#b8892a;border:none;border-radius:2px;color:#1c1814;font-size:1.05rem;font-weight:bold;cursor:pointer;letter-spacing:1px;box-shadow:0 3px 0 rgba(0,0,0,.5)}
+.sbtn:hover{background:#d4a843}
+#game{display:none;padding:.75rem;max-width:840px;margin:0 auto}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;padding-bottom:.5rem;border-bottom:1px solid #3d3530;flex-wrap:wrap;gap:.4rem}
+.gt{font-size:.95rem;font-weight:bold;color:#b8892a;letter-spacing:1px}
+.scs{display:flex;gap:.5rem}
+.sc{background:#2e2820;border:1px solid #3d3530;border-radius:3px;padding:.3rem .75rem;text-align:center;min-width:78px}
+.sc.on{border-color:#b8892a;box-shadow:0 0 8px rgba(184,137,42,.2)}
+.scn{font-size:.58rem;font-weight:bold;text-transform:uppercase;letter-spacing:1px;color:#7a6e62}
+.scv{font-size:1.6rem;font-weight:bold;color:#d4a843;line-height:1}
+#stbar{font-size:.62rem;font-weight:bold;text-transform:uppercase;letter-spacing:1px;color:#7a6e62;margin-bottom:.35rem}
+#ttbox{background:#2e2820;border-left:3px solid #b8892a;padding:.45rem .8rem;margin-bottom:.45rem;font-style:italic;color:#7a6e62;font-size:.8rem;min-height:2rem}
+.leg{display:flex;gap:.55rem;flex-wrap:wrap;font-size:.55rem;margin-bottom:.4rem;font-weight:bold;text-transform:uppercase;color:#7a6e62}
+.li{display:flex;align-items:center;gap:3px}
+.ls{width:9px;height:9px;border-radius:1px;display:inline-block}
+.bw{overflow-x:auto;margin-bottom:.45rem}
+#board{display:grid;grid-template-columns:repeat(15,1fr);gap:1px;background:#080604;border:2px solid #b8892a;border-radius:2px;padding:2px;width:100%;max-width:560px;margin:0 auto;aspect-ratio:1/1}
+.cell{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;border-radius:1px;font-size:clamp(.24rem,.82vw,.48rem);font-weight:bold;cursor:pointer;background:#1a2e1e;color:rgba(255,255,255,.4);text-align:center;line-height:1;user-select:none;position:relative}
+.cell:hover{filter:brightness(1.4)}
+.tw{background:#7a1a1a;color:#ffaaaa}.dw{background:#6a2808;color:#ffccaa}
+.tl{background:#1a3a5a;color:#aaccff}.dl{background:#102840;color:#8899cc}
+.star{background:#5a1010;color:#ffaaaa}
+.bsq{background:#1a3a10;color:#6abf4a}
+.ht{background:#f0e2c0!important;color:#1c1814!important;font-size:clamp(.44rem,1.3vw,.74rem)!important;font-weight:bold;cursor:default;box-shadow:1px 2px 0 #8a6a20,2px 3px 0 rgba(0,0,0,.4)}
+.ts{position:absolute;bottom:1px;right:2px;font-size:.32em;color:#5a524a}
+.pt{background:#f5eacc!important;box-shadow:0 0 6px rgba(212,168,67,.5),1px 2px 0 #8a6a20!important}
+.hl{outline:1px solid #b8892a}
+#prev{background:#223828;border:1px solid #b8892a;border-radius:3px;padding:.38rem .75rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.55rem;flex-wrap:wrap}
+#prev.hidden{display:none}
+.pp{font-size:1.15rem;font-weight:bold;color:#d4a843}
+.pok{color:#6abf4a;font-weight:bold;font-size:.68rem}
+.pbad{color:#bf4a4a;font-weight:bold;font-size:.68rem}
+.pbn{color:#6abf4a;font-size:.68rem;font-weight:bold}
+.rsec{background:#242018;border:1px solid #3d3530;border-radius:3px;padding:.55rem .8rem;margin-bottom:.45rem}
+.rl{font-size:.6rem;font-weight:bold;text-transform:uppercase;letter-spacing:2px;color:#7a6e62;margin-bottom:.38rem;display:flex;justify-content:space-between}
+#rack{display:flex;gap:5px;flex-wrap:wrap;min-height:44px;align-items:center}
+.rt{width:40px;height:40px;background:#f0e2c0;color:#1c1814;border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:bold;font-size:1.05rem;cursor:pointer;position:relative;box-shadow:1px 3px 0 #8a6a20,2px 4px 0 rgba(0,0,0,.5);user-select:none;transition:transform .12s}
+.rt:hover{transform:translateY(-3px)}
+.rt.sel{transform:translateY(-6px);background:#f5eacc;box-shadow:0 0 8px rgba(212,168,67,.4),1px 8px 0 #8a6a20,2px 9px 0 rgba(0,0,0,.5)}
+.tp{font-size:.4rem;position:absolute;bottom:2px;right:3px;color:#5a524a}
+.ctrls{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.45rem}
+.btn{padding:.42rem .8rem;border:1px solid transparent;border-radius:2px;font-family:Georgia,serif;font-size:.78rem;font-weight:bold;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.4);transition:filter .12s}
+.btn:hover{filter:brightness(1.18)}
+.bsub{background:#253f18;border-color:#3a6020;color:#aaffaa}
+.brec{background:#2e2820;border-color:#3d3530;color:#e8dcc8}
+.bpas{background:#2e2820;border-color:#6a2020;color:#ffaaaa}
+.bshu{background:#2e2820;border-color:#b8892a;color:#d4a843}
+.bshr{background:#b8892a;border-color:#d4a843;color:#1c1814}
+.ovl{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:100;align-items:center;justify-content:center;padding:1rem}
+.ovl.open{display:flex}
+.md{background:#242018;border:1px solid #b8892a;border-radius:3px;padding:1.4rem;max-width:400px;width:100%;text-align:center}
+.md h2{font-size:1.2rem;margin-bottom:.7rem;color:#b8892a}
+.md p{margin-bottom:.7rem;color:#7a6e62;font-size:.82rem;line-height:1.5}
+.surl{background:#1c1814;border:1px solid #3d3530;border-radius:2px;padding:.6rem;font-size:.62rem;word-break:break-all;margin-bottom:.7rem;color:#b8892a;cursor:pointer;font-family:monospace;text-align:left}
+.mbtns{display:flex;gap:.4rem;justify-content:center}
+.bpk{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin:.7rem 0}
+.bo{padding:.28rem;background:#f0e2c0;color:#1c1814;border:none;border-radius:2px;font-weight:bold;font-size:.82rem;cursor:pointer}
+.bo:hover{background:#f5eacc}
+.popup{position:fixed;top:45%;left:50%;transform:translate(-50%,-50%);background:#2e2820;border:2px solid #b8892a;color:#d4a843;padding:.9rem 1.5rem;border-radius:3px;font-size:1.3rem;font-weight:bold;z-index:200;pointer-events:none;text-align:center;white-space:pre-line;animation:pa 2.2s forwards}
+@keyframes pa{0%{opacity:0;transform:translate(-50%,-44%) scale(.85)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.03)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-56%)}}
+.fb{position:fixed;pointer-events:none;font-size:1.2rem;font-weight:bold;color:#d4a843;animation:fu 1.5s forwards;z-index:150;left:50%;top:35%}
+@keyframes fu{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-60px)}}
+#go{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;text-align:center}
+.got{font-size:clamp(2rem,7vw,4rem);font-weight:bold;color:#d4a843;margin-bottom:1rem;text-shadow:3px 3px 0 rgba(0,0,0,.5)}
+.fsc{display:flex;gap:1.5rem;margin:1rem 0;flex-wrap:wrap;justify-content:center}
+.fc{background:#242018;border:1px solid #3d3530;border-radius:3px;padding:1.4rem;min-width:125px}
+.fc.win{border-color:#b8892a;box-shadow:0 0 20px rgba(184,137,42,.22)}
+@media(max-width:480px){.scv{font-size:1.3rem}.rt{width:34px;height:34px;font-size:.92rem}}
+</style>
+</head>
+<body>
+
+<div id="setup">
+  <div class="logo">Tilesworth McGee's<br>Profanity Emporium</div>
+  <div class="tag">"Where vocabulary goes to sin."</div>
+  <div class="card">
+    <h2>WHO'S PLAYING, DEGENERATE?</h2>
+    <div class="ig"><label>Player 1</label><input type="text" id="p1" placeholder="Your filthy name..." maxlength="20"></div>
+    <div class="ig"><label>Player 2</label><input type="text" id="p2" placeholder="Their filthy name..." maxlength="20"></div>
+    <button class="sbtn" id="startbtn">LET'S GET NASTY</button>
+  </div>
+</div>
+
+<div id="game">
+  <div class="hdr">
+    <div class="gt">TILESWORTH McGEE'S</div>
+    <div class="scs">
+      <div class="sc on" id="sc0"><div class="scn" id="sn0">P1</div><div class="scv" id="sv0">0</div></div>
+      <div class="sc" id="sc1"><div class="scn" id="sn1">P2</div><div class="scv" id="sv1">0</div></div>
+    </div>
+  </div>
+  <div id="stbar">Loading...</div>
+  <div id="ttbox">Game on. May the filthiest vocabulary win.</div>
+  <div class="leg">
+    <div class="li"><span class="ls" style="background:#7a1a1a"></span>TW</div>
+    <div class="li"><span class="ls" style="background:#6a2808"></span>DW</div>
+    <div class="li"><span class="ls" style="background:#1a3a5a"></span>TL</div>
+    <div class="li"><span class="ls" style="background:#102840"></span>DL</div>
+    <div class="li"><span class="ls" style="background:#1a3a10"></span>Nasty Bonus</div>
+  </div>
+  <div class="bw"><div id="board"></div></div>
+  <div id="prev" class="hidden">
+    <span id="pw" style="font-weight:bold;text-transform:uppercase;letter-spacing:2px;font-size:.82rem"></span>
+    <span id="pp" class="pp"></span>
+    <span id="pv"></span>
+    <span id="pb" class="pbn"></span>
+  </div>
+  <div class="rsec">
+    <div class="rl"><span id="rind">Rack</span><span id="bagcnt">Bag: --</span></div>
+    <div id="rack"></div>
+  </div>
+  <div class="ctrls">
+    <button class="btn bsub" id="subbtn">Submit</button>
+    <button class="btn brec" id="recbtn">Recall</button>
+    <button class="btn bshu" id="shubtn">Shuffle</button>
+    <button class="btn bpas" id="pasbtn">Pass</button>
+    <button class="btn bshr" id="shrbtn">Send Turn</button>
+  </div>
+</div>
+
+<div id="go">
+  <div class="got">GAME OVER,<br>SUCKERS.</div>
+  <div class="fsc" id="fsc"></div>
+  <button class="btn bshr" style="font-size:.95rem;padding:.65rem 1.8rem" id="newbtn">New Game</button>
+</div>
+
+<div class="ovl" id="sharemo">
+  <div class="md">
+    <h2>Send Your Turn</h2>
+    <p>Copy this URL and send it to your opponent. It contains the entire game state.</p>
+    <div class="surl" id="surl">...</div>
+    <div id="cpd" style="color:#6abf4a;font-weight:bold;display:none;margin-bottom:.5rem;font-size:.78rem">Copied!</div>
+    <div class="mbtns">
+      <button class="btn bsub" id="copybtn">Copy URL</button>
+      <button class="btn brec" id="closeshare">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="ovl" id="blankmo">
+  <div class="md">
+    <h2>Blank Tile - Pick a Letter</h2>
+    <div class="bpk" id="bpk"></div>
+  </div>
+</div>
+
+<script>
+var TV={A:1,B:3,C:3,D:2,E:1,F:4,G:2,H:4,I:1,J:8,K:5,L:1,M:3,N:1,O:1,P:3,Q:10,R:1,S:1,T:1,U:1,V:4,W:4,X:8,Y:4,Z:10,"_":0};
+var TC={A:9,B:2,C:2,D:4,E:12,F:2,G:3,H:2,I:9,J:1,K:1,L:4,M:2,N:6,O:8,P:2,Q:1,R:6,S:4,T:6,U:4,V:2,W:2,X:1,Y:2,Z:1,"_":2};
+var BS=15,CTR=112;
+var TWS={0:1,7:1,14:1,105:1,119:1,210:1,217:1,224:1};
+var DWS={16:1,28:1,32:1,42:1,48:1,56:1,64:1,70:1,154:1,160:1,168:1,176:1,182:1,192:1,196:1,208:1};
+var TLS={20:1,24:1,76:1,80:1,84:1,88:1,100:1,104:1,116:1,120:1,136:1,140:1,144:1,148:1};
+var DLS={3:1,11:1,36:1,38:1,45:1,52:1,59:1,92:1,96:1,98:1,102:1,108:1,122:1,129:1,132:1,165:1,172:1,179:1,186:1,189:1,213:1,221:1};
+var BSQS={18:1,26:1,44:1,60:1,66:1,90:1,134:1,158:1,164:1,180:1,198:1,206:1};
+var W={"AA":1,"AB":1,"AD":1,"AE":1,"AG":1,"AH":1,"AI":1,"AL":1,"AM":1,"AN":1,"AR":1,"AS":1,"AT":1,"AW":1,"AX":1,"AY":1,"BA":1,"BE":1,"BI":1,"BO":1,"BY":1,"DA":1,"DE":1,"DO":1,"ED":1,"EF":1,"EH":1,"EL":1,"EM":1,"EN":1,"ER":1,"ES":1,"ET":1,"EX":1,"FA":1,"FE":1,"GI":1,"GO":1,"HA":1,"HE":1,"HI":1,"HM":1,"HO":1,"ID":1,"IF":1,"IN":1,"IS":1,"IT":1,"JO":1,"KA":1,"KI":1,"LA":1,"LI":1,"LO":1,"MA":1,"ME":1,"MI":1,"MM":1,"MO":1,"MU":1,"MY":1,"NA":1,"NE":1,"NO":1,"NU":1,"OD":1,"OE":1,"OF":1,"OH":1,"OI":1,"OM":1,"ON":1,"OP":1,"OR":1,"OS":1,"OW":1,"OX":1,"OY":1,"PA":1,"PE":1,"PI":1,"PO":1,"QI":1,"RE":1,"SI":1,"SO":1,"TA":1,"TI":1,"TO":1,"UH":1,"UM":1,"UN":1,"UP":1,"US":1,"UT":1,"WE":1,"WO":1,"XI":1,"XU":1,"YA":1,"YE":1,"YO":1,"ZA":1};
+var BW={"ASS":1,"ARSE":1,"DAMN":1,"CRAP":1,"FART":1,"POOP":1,"TURD":1,"PISS":1,"BITCH":1,"BASTARD":1,"JACKASS":1,"DUMBASS":1,"ASSHAT":1,"YEET":1,"SLAY":1,"RIZZ":1,"BUSSIN":1,"GYAT":1,"THICC":1,"DRIP":1,"CLOUT":1,"FLEX":1,"SLAPS":1,"BANGER":1,"BADDIE":1,"SAVAGE":1,"SNATCHED":1,"TURNT":1,"SWOLE":1,"ZADDY":1,"SHEESH":1,"DEADASS":1,"PRESSED":1,"RATCHET":1,"SALTY":1,"SHOOK":1,"FINESSE":1,"BITCHY":1,"DINGBAT":1,"MORON":1,"DOOFUS":1,"MEATHEAD":1,"AIRHEAD":1,"SLEAZE":1,"SLIME":1,"SCUM":1,"SMUTTY":1,"SLEAZY":1,"TRASHY":1,"VULGAR":1,"SCHMUCK":1,"BOZO":1,"GRODY":1,"LOOPY":1,"NUTTY":1,"WACKO":1,"SLIMY":1,"SHADY":1,"SEEDY":1,"SKETCHY":1,"LOWKEY":1,"HIGHKEY":1,"ABOVE":1,"AGILE":1,"AISLE":1,"ALIVE":1,"AMAZE":1,"AMISS":1,"AMPLE":1,"AMUSE":1,"ANGEL":1,"ANKLE":1,"ANVIL":1,"APPLY":1,"APTLY":1,"ARENA":1,"ARGUE":1,"ARISE":1,"AROSE":1,"ARRAY":1,"ARROW":1,"ARSON":1,"ARTSY":1,"ASIDE":1,"ASSET":1,"ATTIC":1,"AVERT":1,"AWFUL":1,"BAKER":1,"BASIN":1,"BASIS":1,"BATCH":1,"BEACH":1,"BEARD":1,"BEGIN":1,"BEHAVE":1,"BEING":1,"BELOW":1,"BENCH":1,"BIRTH":1,"BLACK":1,"BLADE":1,"BLAME":1,"BLAND":1,"BLANK":1,"BLAZE":1,"BLEAK":1,"BLEED":1,"BLEND":1,"BLESS":1,"BLIND":1,"BLINK":1,"BLISS":1,"BLOCK":1,"BLOOD":1,"BLOOM":1,"BOAST":1,"BONUS":1,"BOOST":1,"BORED":1,"BRAID":1,"BRAIN":1,"BRAKE":1,"BRAND":1,"BRASS":1,"BRAVE":1,"BRAVED":1,"BREAK":1,"BREED":1,"BRIEF":1,"BRINE":1,"BRINK":1,"BRISK":1,"BROAD":1,"BROOK":1,"BROTH":1,"BROWN":1,"BRUSH":1,"BUILD":1,"BUILT":1,"BUNNY":1,"BURNT":1,"BURST":1,"BUYER":1,"CAMEL":1,"CANDY":1,"CARRY":1,"CATCH":1,"CAUSE":1,"CAVES":1,"CHALK":1,"CHASE":1,"CHEAP":1,"CHEAT":1,"CHECK":1,"CHEEK":1,"CHEER":1,"CHESS":1,"CHEST":1,"CHILD":1,"CHINA":1,"CHIVE":1,"CHOIR":1,"CHOSE":1,"CHUNK":1,"CIVIC":1,"CIVIL":1,"CLAIM":1,"CLASH":1,"CLASS":1,"CLEAN":1,"CLEAR":1,"CLICK":1,"CLIFF":1,"CLIMB":1,"CLING":1,"CLOCK":1,"CLONE":1,"CLOSE":1,"CLOTH":1,"CLOUD":1,"CLOVE":1,"CLOVES":1,"CLOWN":1,"COACH":1,"COAST":1,"COBRA":1,"COMET":1,"COMIC":1,"COMMA":1,"CORAL":1,"COUNT":1,"COURT":1,"COVE":1,"COVER":1,"CRACK":1,"CRAFT":1,"CRANE":1,"CRASH":1,"CRAVE":1,"CRAVED":1,"CRAZY":1,"CREAM":1,"CREEK":1,"CREST":1,"CRISP":1,"CROSS":1,"CROWD":1,"CROWN":1,"CRUEL":1,"CRUSH":1,"CURVE":1,"CYCLE":1,"DAILY":1,"DANCE":1,"DEALT":1,"DEATH":1,"DECAY":1,"DECOY":1,"DENSE":1,"DEPTH":1,"DEVIL":1,"DIVER":1,"DODGE":1,"DONOR":1,"DOUBT":1,"DOUGH":1,"DOVE":1,"DOZEN":1,"DRAFT":1,"DRAIN":1,"DRANK":1,"DRAPE":1,"DREAM":1,"DRESS":1,"DRIED":1,"DRIFT":1,"DRINK":1,"DRIVE":1,"DRIVEL":1,"DRIVEN":1,"DRIVES":1,"DROVE":1,"DRUNK":1,"DRYER":1,"DYING":1,"EAGER":1,"EAGLE":1,"EARLY":1,"EARTH":1,"EERIE":1,"EIGHT":1,"ELITE":1,"EMOTE":1,"EMPTY":1,"ENEMY":1,"ENJOY":1,"ENTER":1,"ENTRY":1,"EQUAL":1,"ERROR":1,"ESSAY":1,"EVERY":1,"EVOKE":1,"EXACT":1,"EXILE":1,"EXIST":1,"FABLE":1,"FAINT":1,"FAITH":1,"FANCY":1,"FATAL":1,"FAULT":1,"FEAST":1,"FENCE":1,"FEVER":1,"FIBER":1,"FIELD":1,"FIFTH":1,"FIFTY":1,"FIGHT":1,"FINAL":1,"FIRST":1,"FIVE":1,"FLAIR":1,"FLAME":1,"FLANK":1,"FLARE":1,"FLASH":1,"FLASK":1,"FLOCK":1,"FLOOD":1,"FLOOR":1,"FLOUR":1,"FLUID":1,"FLUTE":1,"FOCAL":1,"FOCUS":1,"FORCE":1,"FORGE":1,"FORTH":1,"FORUM":1,"FOUND":1,"FRAME":1,"FRANK":1,"FRAUD":1,"FRESH":1,"FRIGHT":1,"FRONT":1,"FROST":1,"FROZE":1,"FRUIT":1,"FULLY":1,"GAUGE":1,"GAVE":1,"GHOST":1,"GIANT":1,"GIVEN":1,"GIVES":1,"GLASS":1,"GLEAN":1,"GLOBE":1,"GLOOM":1,"GLORY":1,"GLOSS":1,"GLOVE":1,"GLOVES":1,"GOING":1,"GRACE":1,"GRADE":1,"GRAIN":1,"GRAND":1,"GRANT":1,"GRAPE":1,"GRASP":1,"GRASS":1,"GRATE":1,"GRAVE":1,"GRAVEL":1,"GRAVY":1,"GRAZE":1,"GREAT":1,"GREED":1,"GREET":1,"GRIEF":1,"GRIEVE":1,"GRILL":1,"GRIME":1,"GRIMY":1,"GRIND":1,"GRIPE":1,"GROAN":1,"GROIN":1,"GROOM":1,"GROPE":1,"GROTTO":1,"GROUND":1,"GROUP":1,"GROUSE":1,"GROUT":1,"GROVE":1,"GROVEL":1,"GROWL":1,"GRUEL":1,"GRUFF":1,"GRUMP":1,"GRUMPY":1,"GRUNT":1,"GUARD":1,"GUESS":1,"GUEST":1,"GUIDE":1,"GUILD":1,"GUILT":1,"HAPPY":1,"HARSH":1,"HAVE":1,"HAVEN":1,"HEART":1,"HEAVY":1,"HEDGE":1,"HENCE":1,"HINGE":1,"HORSE":1,"HOTEL":1,"HOUSE":1,"HOVEL":1,"HUMAN":1,"HUMID":1,"HURRY":1,"IDEAL":1,"IMAGE":1,"IMPLY":1,"INDEX":1,"INNER":1,"INPUT":1,"INTRO":1,"ISSUE":1,"IVORY":1,"JEWEL":1,"JIVE":1,"JUDGE":1,"JUICE":1,"JUICY":1,"JUMBO":1,"KARMA":1,"KAYAK":1,"KNAVE":1,"KNIFE":1,"KNIVES":1,"KNOCK":1,"KNOWN":1,"LABEL":1,"LANCE":1,"LARGE":1,"LASER":1,"LATER":1,"LAVE":1,"LEARN":1,"LEASE":1,"LEAST":1,"LEAVE":1,"LEDGE":1,"LEGAL":1,"LEMON":1,"LEVEL":1,"LIGHT":1,"LILAC":1,"LIVED":1,"LIVER":1,"LIVES":1,"LOCAL":1,"LODGE":1,"LOGIC":1,"LOVE":1,"LOVED":1,"LOVER":1,"LOWER":1,"LUCKY":1,"LUNAR":1,"MAGIC":1,"MAJOR":1,"MAKER":1,"MANOR":1,"MAPLE":1,"MARCH":1,"MARSH":1,"MARVEL":1,"MATCH":1,"MAYOR":1,"MEDIA":1,"MERCY":1,"MERGE":1,"MERIT":1,"METAL":1,"MINOR":1,"MINUS":1,"MIRTH":1,"MONEY":1,"MONTH":1,"MORAL":1,"MOTOR":1,"MOUTH":1,"MOVED":1,"MOVER":1,"MOVES":1,"MOVIE":1,"MUSIC":1,"NAIVE":1,"NAVE":1,"NAVEL":1,"NEWLY":1,"NIGHT":1,"NINJA":1,"NOBLE":1,"NOISE":1,"NOTCH":1,"NOVEL":1,"OCEAN":1,"OFFER":1,"OFTEN":1,"OLIVE":1,"ONSET":1,"OPERA":1,"ORDER":1,"OTTER":1,"OUTER":1,"OVERT":1,"OWNER":1,"OXIDE":1,"OZONE":1,"PAINT":1,"PANDA":1,"PANIC":1,"PATCH":1,"PAUSE":1,"PAVED":1,"PEACE":1,"PEACH":1,"PEARL":1,"PEDAL":1,"PENNY":1,"PERCH":1,"PERIL":1,"PHASE":1,"PHONE":1,"PHOTO":1,"PIANO":1,"PIECE":1,"PILOT":1,"PITCH":1,"PIXEL":1,"PLACE":1,"PLAIN":1,"PLANE":1,"PLANT":1,"PLATE":1,"PLAZA":1,"PLEAD":1,"PLUCK":1,"PLUMB":1,"PLUME":1,"PLUMP":1,"POINT":1,"POLAR":1,"POPPY":1,"PORCH":1,"POUCH":1,"POUND":1,"POWER":1,"PRANK":1,"PREEN":1,"PRICE":1,"PRIDE":1,"PRIME":1,"PRINT":1,"PRIOR":1,"PRIZE":1,"PRONE":1,"PROUD":1,"PROVE":1,"PROVED":1,"PROVEN":1,"PROWL":1,"PURSE":1,"QUEEN":1,"QUERY":1,"QUEST":1,"QUICK":1,"QUIET":1,"QUIRK":1,"QUITE":1,"QUOTA":1,"QUOTE":1,"RABBI":1,"RADAR":1,"RADIO":1,"RAINY":1,"RALLY":1,"RANCH":1,"RANGE":1,"RAPID":1,"RAVE":1,"RAVED":1,"REACH":1,"REBEL":1,"REIGN":1,"RELAX":1,"REPAY":1,"RIDER":1,"RIDGE":1,"RIFLE":1,"RIGHT":1,"RIPEN":1,"RISEN":1,"RIVAL":1,"RIVER":1,"ROBIN":1,"ROBOT":1,"ROCKY":1,"ROUGE":1,"ROUGH":1,"ROUND":1,"ROUTE":1,"ROVE":1,"ROVER":1,"ROYAL":1,"RUGBY":1,"RULER":1,"RUMOR":1,"SADLY":1,"SAINT":1,"SALAD":1,"SANDY":1,"SAUCE":1,"SAUNA":1,"SAVED":1,"SAVOR":1,"SCALE":1,"SCALP":1,"SCENE":1,"SCENT":1,"SCORE":1,"SCORN":1,"SCOUT":1,"SCOWL":1,"SCRAM":1,"SCRAP":1,"SCREW":1,"SCRUB":1,"SEIZE":1,"SENSE":1,"SERVE":1,"SEVEN":1,"SEWER":1,"SHACK":1,"SHAFT":1,"SHAKE":1,"SHALL":1,"SHAME":1,"SHAPE":1,"SHARE":1,"SHARK":1,"SHARP":1,"SHAVE":1,"SHAVED":1,"SHEAR":1,"SHEEP":1,"SHEER":1,"SHELF":1,"SHELL":1,"SHIFT":1,"SHINE":1,"SHIRT":1,"SHORE":1,"SHORT":1,"SHOUT":1,"SHOVE":1,"SHOVED":1,"SHOVEL":1,"SIGHT":1,"SINCE":1,"SIXTH":1,"SIXTY":1,"SIZED":1,"SKATE":1,"SKILL":1,"SKULL":1,"SLATE":1,"SLAVE":1,"SLEEK":1,"SLEEP":1,"SLEET":1,"SLEPT":1,"SLIDE":1,"SLOPE":1,"SMART":1,"SMASH":1,"SMELL":1,"SMILE":1,"SMOKE":1,"SNACK":1,"SNAIL":1,"SNAKE":1,"SNARE":1,"SNEAK":1,"SOLAR":1,"SOLID":1,"SOLVE":1,"SORRY":1,"SOUTH":1,"SPACE":1,"SPADE":1,"SPARE":1,"SPARK":1,"SPEAK":1,"SPEAR":1,"SPEED":1,"SPELL":1,"SPEND":1,"SPENT":1,"SPICE":1,"SPILL":1,"SPITE":1,"SPLIT":1,"SPOKE":1,"SPOON":1,"SPRAY":1,"SPREE":1,"SQUAD":1,"SQUAT":1,"STACK":1,"STAFF":1,"STAGE":1,"STAIN":1,"STAKE":1,"STALE":1,"STALL":1,"STAMP":1,"STAND":1,"STARK":1,"START":1,"STATE":1,"STAVE":1,"STAYS":1,"STEAK":1,"STEAL":1,"STEAM":1,"STEEL":1,"STEEP":1,"STEER":1,"STERN":1,"STICK":1,"STIFF":1,"STILL":1,"STING":1,"STINK":1,"STOCK":1,"STOMP":1,"STONE":1,"STOOD":1,"STOOP":1,"STORE":1,"STORM":1,"STORY":1,"STOUT":1,"STOVE":1,"STRAW":1,"STRIP":1,"STRIVE":1,"STUCK":1,"STUDY":1,"STUMP":1,"STUNG":1,"STYLE":1,"SUAVE":1,"SUGAR":1,"SUITE":1,"SUNNY":1,"SUPER":1,"SURGE":1,"SWEAR":1,"SWEAT":1,"SWEEP":1,"SWEET":1,"SWEPT":1,"SWIFT":1,"SWING":1,"SWIPE":1,"SWIRL":1,"SWORD":1,"SYRUP":1,"TAUNT":1,"TEETH":1,"TEMPO":1,"TENSE":1,"THEIR":1,"THEME":1,"THERE":1,"THESE":1,"THICK":1,"THING":1,"THINK":1,"THORN":1,"THOSE":1,"THREE":1,"THREW":1,"THRIVE":1,"THROW":1,"THUMB":1,"TIGER":1,"TIGHT":1,"TIRED":1,"TITLE":1,"TODAY":1,"TOKEN":1,"TORCH":1,"TOTAL":1,"TOUCH":1,"TOUGH":1,"TOWEL":1,"TOXIC":1,"TRACE":1,"TRACK":1,"TRADE":1,"TRAIL":1,"TRAIN":1,"TRAIT":1,"TRASH":1,"TRAVEL":1,"TREAD":1,"TREAT":1,"TREND":1,"TRIAL":1,"TRIBE":1,"TRICK":1,"TRIED":1,"TROOP":1,"TROUT":1,"TROVE":1,"TRUCE":1,"TRUCK":1,"TRULY":1,"TRUNK":1,"TRUST":1,"TRUTH":1,"TUMOR":1,"TUNIC":1,"TWIRL":1,"TWIST":1,"ULCER":1,"ULTRA":1,"UNDER":1,"UNION":1,"UNITE":1,"UNITY":1,"UNTIL":1,"UPPER":1,"UPSET":1,"URBAN":1,"USAGE":1,"VAGUE":1,"VALOR":1,"VALUE":1,"VALVE":1,"VAPOR":1,"VAULT":1,"VENOM":1,"VERSE":1,"VIDEO":1,"VIGOR":1,"VIRAL":1,"VIRUS":1,"VISOR":1,"VISTA":1,"VITAL":1,"VIVID":1,"VOCAL":1,"VOTER":1,"WAGON":1,"WALTZ":1,"WASTE":1,"WATCH":1,"WATER":1,"WAVED":1,"WEARY":1,"WEDGE":1,"WEIGH":1,"WEIRD":1,"WHALE":1,"WHEAT":1,"WHEEL":1,"WHERE":1,"WHILE":1,"WHITE":1,"WHOLE":1,"WHOSE":1,"WITCH":1,"WIVES":1,"WOMAN":1,"WOMEN":1,"WORLD":1,"WORRY":1,"WORSE":1,"WORST":1,"WORTH":1,"WOULD":1,"WOUND":1,"WOVE":1,"WOVEN":1,"WRATH":1,"WRITE":1,"WROTE":1,"YACHT":1,"YEARN":1,"YIELD":1,"YOUNG":1,"YOURS":1,"YOUTH":1,"YUMMY":1,"ZEBRA":1,"ZIPPY":1};
+var TRASH=[["{p} actually knows words. Mom must be so proud.","{p} spelled that like a degenerate scholar. Impressive.","The audacity of {p}. Absolute uncut audacity.","{p} out here treating tiles like they owe them money.","{p} playing chess while {o} plays Go Fish. Rough."],["{p} NASTY BONUS - said the quiet part loud AND got paid.","{p} played a filthy word and the universe rewarded them.","{p} said that with tiles. In front of everyone. Plus ten points.","{p} did not come to play nice. Hall of fame material."],["{p} played THAT? My dead goldfish could do better.","Is {p} okay? That word looks like their keyboard fell.","{p} looked at those tiles and said yes THIS. Bold. Wrong."],["{p} PASSED? The cowardice. The absolute cowardice.","{p} passed like a student who did not study.","{p} has nothing to offer. Honestly fair."],["{p} is absolutely cooking. Someone call the tile police.","{p} on a rampage. {o} should find a new hobby."]];
+function tt(ti,p,o){var a=TRASH[ti]||TRASH[0];return a[Math.floor(Math.random()*a.length)].replace(/{p}/g,p).replace(/{o}/g,o||"them");}
+var G=null,SEL=null,PLACED=[];
+function buildBag(){var b=[],k=Object.keys(TC);for(var i=0;i<k.length;i++){var l=k[i];for(var j=0;j<TC[l];j++)b.push(l);}for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+function drawN(bag,n){return bag.splice(0,Math.min(n,bag.length));}
+function newGame(p1,p2){var bag=buildBag();return{p1:p1,p2:p2,scores:[0,0],board:new Array(225).fill(null),bag:bag,racks:[drawN(bag,7),drawN(bag,7)],cur:0,passes:0,turn:0,msg:"Game on. May the filthiest vocabulary win.",over:false,v:7};}
+function enc(g){try{return btoa(encodeURIComponent(JSON.stringify(g)));}catch(e){return "";}}
+function dec(s){try{return JSON.parse(decodeURIComponent(atob(s)));}catch(e){return null;}}
+function startGame(){var p1=document.getElementById("p1").value.trim()||"Player 1";var p2=document.getElementById("p2").value.trim()||"Player 2";G=newGame(p1,p2);document.getElementById("setup").style.display="none";document.getElementById("game").style.display="block";renderAll();}
+function renderAll(){rBoard();rRack();rScores();rStatus();rPreview();}
+function isPlaced(i){for(var k=0;k<PLACED.length;k++){if(PLACED[k].ci===i)return true;}return false;}
+function rBoard(){var el=document.getElementById("board");el.innerHTML="";for(var i=0;i<225;i++){var d=document.createElement("div");d.className="cell";d.setAttribute("data-i",""+i);var tile=G.board[i];if(tile){d.className="cell ht"+(isPlaced(i)?" pt":"");d.textContent=tile.l;var sp=document.createElement("span");sp.className="ts";sp.textContent=""+(tile.o=="_"?0:(TV[tile.l]||0));d.appendChild(sp);}else{if(i===CTR)d.className="cell star";else if(TWS[i])d.className="cell tw";else if(DWS[i])d.className="cell dw";else if(TLS[i])d.className="cell tl";else if(DLS[i])d.className="cell dl";else if(BSQS[i])d.className="cell bsq";d.onclick=(function(idx){return function(){cellClick(idx);};})(i);}el.appendChild(d);}}
+function rRack(){var el=document.getElementById("rack");el.innerHTML="";var rack=G.racks[G.cur];for(var i=0;i<rack.length;i++){var l=rack[i];var d=document.createElement("div");d.className="rt"+(i===SEL?" sel":"");var lt=document.createTextNode(l==="_"?"?":l);d.appendChild(lt);var sp=document.createElement("span");sp.className="tp";sp.textContent=""+(TV[l]||0);d.appendChild(sp);d.onclick=(function(idx){return function(){tileClick(idx);};})(i);el.appendChild(d);}}
+function rScores(){document.getElementById("sn0").textContent=G.p1;document.getElementById("sn1").textContent=G.p2;document.getElementById("sv0").textContent=""+G.scores[0];document.getElementById("sv1").textContent=""+G.scores[1];document.getElementById("sc0").className=G.cur===0?"sc on":"sc";document.getElementById("sc1").className=G.cur===1?"sc on":"sc";}
+function rStatus(){var n=G.cur===0?G.p1:G.p2;document.getElementById("rind").textContent=n+"'s rack";document.getElementById("bagcnt").textContent="Bag: "+G.bag.length;document.getElementById("stbar").textContent=n.toUpperCase()+"'S TURN - ROUND "+(G.turn+1);document.getElementById("ttbox").textContent=G.msg;}
+function rPreview(){var pr=document.getElementById("prev");if(!PLACED.length){pr.className="hidden";return;}var mw=getWord();pr.className="";if(!mw){document.getElementById("pw").textContent="???";document.getElementById("pp").textContent="";document.getElementById("pv").className="pbad";document.getElementById("pv").textContent="not in a line";document.getElementById("pb").textContent="";return;}var word=mw.word,up=word.toUpperCase(),valid=!!(W[up]||BW[up]||(word.length>2&&KNOWN[up]));var total=0,bonusTxt="";if(valid){var ns={};for(var k=0;k<PLACED.length;k++)ns[PLACED[k].ci]=1;total+=scoreC(mw.cells,ns);var crosses=getCross();for(var k=0;k<crosses.length;k++){var cw=crosses[k];if(cw.word!==word&&W[cw.word.toUpperCase()])total+=scoreC(cw.cells,ns);}if(PLACED.length===7)total+=50;if(BW[word.toUpperCase()]){total+=10;bonusTxt="Nasty +10!";}}document.getElementById("pw").textContent=word.toUpperCase();document.getElementById("pp").textContent=valid?"+"+total+" pts":"";document.getElementById("pv").className=valid?"pok":"pbad";document.getElementById("pv").textContent=valid?"valid!":"not a word";document.getElementById("pb").textContent=bonusTxt;}
+function tileClick(i){var rack=G.racks[G.cur];if(rack[i]==="_"){SEL=i;showBlank();return;}SEL=(SEL===i)?null:i;rRack();}
+function cellClick(ci){if(SEL===null)return;if(G.board[ci])return;if(isPlaced(ci))return;var rack=G.racks[G.cur];var l=rack[SEL];G.board[ci]={l:l,o:l};PLACED.push({ci:ci,l:l,ol:l});rack.splice(SEL,1);SEL=null;renderAll();}
+function showBlank(){var pk=document.getElementById("bpk");pk.innerHTML="";var alpha="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");for(var i=0;i<alpha.length;i++){var b=document.createElement("button");b.className="bo";b.textContent=alpha[i];b.onclick=(function(ltr){return function(){document.getElementById("blankmo").className="ovl";placeBlank(ltr);};})(alpha[i]);pk.appendChild(b);}document.getElementById("blankmo").className="ovl open";}
+function placeBlank(cl){var rack=G.racks[G.cur];rack[SEL]=cl+"*";rRack();var cells=document.querySelectorAll(".cell");for(var k=0;k<cells.length;k++){if(cells[k].className.indexOf("ht")<0)cells[k].className+=" hl";}document.getElementById("board").onclick=function(e){var c=e.target;while(c&&!c.getAttribute("data-i"))c=c.parentNode;if(!c)return;if(c.className.indexOf("ht")>=0)return;var ci=parseInt(c.getAttribute("data-i"));document.getElementById("board").onclick=null;var allc=document.querySelectorAll(".cell");for(var k=0;k<allc.length;k++){allc[k].className=allc[k].className.replace(" hl","");}G.board[ci]={l:cl,o:"_"};PLACED.push({ci:ci,l:cl,ol:"_"});rack.splice(SEL,1);SEL=null;renderAll();};}
+function recallTiles(){for(var k=0;k<PLACED.length;k++){G.board[PLACED[k].ci]=null;G.racks[G.cur].push(PLACED[k].ol);}PLACED=[];SEL=null;renderAll();}
+function shuffleRack(){var r=G.racks[G.cur];for(var i=r.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=r[i];r[i]=r[j];r[j]=t;}rRack();}
+function getWord(){if(!PLACED.length)return null;var idx=[];for(var k=0;k<PLACED.length;k++)idx.push(PLACED[k].ci);idx.sort(function(a,b){return a-b;});var rows=[],cols=[];for(var k=0;k<idx.length;k++){rows.push(Math.floor(idx[k]/BS));cols.push(idx[k]%BS);}var sr=true,sc2=true;for(var k=1;k<rows.length;k++){if(rows[k]!==rows[0]){sr=false;break;}}for(var k=1;k<cols.length;k++){if(cols[k]!==cols[0]){sc2=false;break;}}if(!sr&&!sc2)return null;var wc=[];if(sr){var row=rows[0],mn=cols[0],mx=cols[cols.length-1];for(var c=mn;c<=mx;c++){var ii=row*BS+c;if(!G.board[ii])return null;wc.push(ii);}var c=mn-1;while(c>=0&&G.board[row*BS+c]){wc.unshift(row*BS+c);c--;}c=mx+1;while(c<BS&&G.board[row*BS+c]){wc.push(row*BS+c);c++;}}else{var col=cols[0],mn=rows[0],mx=rows[rows.length-1];for(var r=mn;r<=mx;r++){var ii=r*BS+col;if(!G.board[ii])return null;wc.push(ii);}var r=mn-1;while(r>=0&&G.board[r*BS+col]){wc.unshift(r*BS+col);r--;}r=mx+1;while(r<BS&&G.board[r*BS+col]){wc.push(r*BS+col);r++;}}var word="";for(var k=0;k<wc.length;k++)word+=G.board[wc[k]].l;return{word:word,cells:wc};}
+function getCross(){var res=[];for(var pi=0;pi<PLACED.length;pi++){var ci=PLACED[pi].ci,row=Math.floor(ci/BS),col=ci%BS,cells,w,r,c;cells=[ci];r=row-1;while(r>=0&&G.board[r*BS+col]){cells.unshift(r*BS+col);r--;}r=row+1;while(r<BS&&G.board[r*BS+col]){cells.push(r*BS+col);r++;}if(cells.length>1){w="";for(var k=0;k<cells.length;k++)w+=G.board[cells[k]].l;res.push({word:w,cells:cells.slice()});}cells=[ci];c=col-1;while(c>=0&&G.board[row*BS+c]){cells.unshift(row*BS+c);c--;}c=col+1;while(c<BS&&G.board[row*BS+c]){cells.push(row*BS+c);c++;}if(cells.length>1){w="";for(var k=0;k<cells.length;k++)w+=G.board[cells[k]].l;var dup=false;for(var k=0;k<res.length;k++){if(res[k].word===w){dup=true;break;}}if(!dup)res.push({word:w,cells:cells.slice()});}}return res;}
+function scoreC(cells,ns){var sum=0,wm=1;for(var k=0;k<cells.length;k++){var i=cells[k],tile=G.board[i],lv=tile.o==="_"?0:(TV[tile.l]||0);if(ns[i]){if(TLS[i])lv*=3;else if(DLS[i])lv*=2;if(TWS[i])wm*=3;else if(DWS[i]||i===CTR)wm*=2;}sum+=lv;}return sum*wm;}
+function setSt(m){document.getElementById("stbar").textContent=m;setTimeout(rStatus,3000);}
+var VALIDATING=false;
+var KNOWN={};
+function checkWord(word,cb){
+  if(!word||word.length<2){cb(false,word);return;}
+  if(word.length===2){cb(!!W[word.toUpperCase()],word);return;}
+  // Check bonus/slang words locally first
+  var up=word.toUpperCase();
+  if(W[up]){cb(true,word);return;}
+  // Use free dictionary API for all other words
+  fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+word.toLowerCase())
+    .then(function(r){if(r.ok)KNOWN[word.toUpperCase()]=1;cb(r.ok,word);})
+    .catch(function(){
+      // If API fails, fall back to local check
+      cb(!!W[up],word);
+    });
+}
+function submitWord(){if(!PLACED.length){setSt("Place some tiles first.");return;}var isFirst=G.turn===0&&!G.scores[0]&&!G.scores[1];if(isFirst&&!isPlaced(CTR)){setSt("First word must cover the center star.");return;}var mw=getWord();if(!mw){setSt("Tiles must be in a straight line with no gaps.");return;}var word=mw.word;VALIDATING=true;
+  document.getElementById("subbtn").textContent="Checking...";
+  checkWord(word,function(valid){
+    document.getElementById("subbtn").textContent="Submit";
+    VALIDATING=false;
+    if(!valid){setSt('"'+word+'" is not a word.');return;}
+    _submitWordContinue(word,mw);
+  });
+  return;}
+function _submitWordContinue(word,mw){if(!isFirst){var ns={};for(var k=0;k<PLACED.length;k++)ns[PLACED[k].ci]=1;var connects=false;for(var k=0;k<mw.cells.length;k++){if(!ns[mw.cells[k]]){connects=true;break;}}if(!connects){var adj=false;for(var pi=0;pi<PLACED.length;pi++){var ci=PLACED[pi].ci,row=Math.floor(ci/BS),col=ci%BS,nbrs=[ci-BS,ci+BS,ci-1,ci+1];for(var k=0;k<nbrs.length;k++){var n=nbrs[k];if(n>=0&&n<225&&G.board[n]&&!ns[n]){adj=true;break;}}if(adj)break;}if(!adj){setSt("Word must connect to existing tiles.");return;}}}var ns2={};for(var k=0;k<PLACED.length;k++)ns2[PLACED[k].ci]=1;var total=scoreC(mw.cells,ns2),allW=[word],nasty=[];var crosses=getCross();for(var k=0;k<crosses.length;k++){var cw=crosses[k];if(cw.word===word)continue;if(!W[cw.word.toUpperCase()]&&!BW[cw.word.toUpperCase()]&&!KNOWN[cw.word.toUpperCase()]){setSt('"'+cw.word+'" is not valid. Recall and retry.');return;}allW.push(cw.word);total+=scoreC(cw.cells,ns2);}if(PLACED.length===7)total+=50;for(var k=0;k<allW.length;k++){if(BW[allW[k].toUpperCase()])nasty.push(allW[k]);}total+=nasty.length*10;var pn=G.cur===0?G.p1:G.p2,on=G.cur===0?G.p2:G.p1;G.scores[G.cur]+=total;var ti=0;if(nasty.length)ti=1;else if(total<5)ti=2;else if(G.scores[G.cur]>G.scores[1-G.cur]+30)ti=4;G.msg=tt(ti,pn,on);if(nasty.length)showPopup("NASTY BONUS +"+nasty.length*10+"\n"+nasty.join(", "));else if(PLACED.length===7)showPopup("BINGO! +50 pts!");else showFloat("+"+total);var drawn=drawN(G.bag,7-G.racks[G.cur].length);for(var k=0;k<drawn.length;k++)G.racks[G.cur].push(drawn[k]);G.passes=0;G.turn++;PLACED=[];SEL=null;if(G.bag.length===0&&G.racks[G.cur].length===0){endGame();return;}G.cur=1-G.cur;renderAll();}
+function passTurn(){recallTiles();G.msg=tt(3,G.cur===0?G.p1:G.p2);G.passes++;G.turn++;if(G.passes>=4){endGame();return;}G.cur=1-G.cur;renderAll();}
+function endGame(){G.over=true;document.getElementById("game").style.display="none";document.getElementById("go").style.display="flex";var w=G.scores[0]>G.scores[1]?0:(G.scores[1]>G.scores[0]?1:-1);var c=document.getElementById("fsc");c.innerHTML="";for(var i=0;i<2;i++){var d=document.createElement("div");d.className=w===i?"fc win":"fc";var nm=document.createElement("div");nm.className="scn";nm.textContent=i===0?G.p1:G.p2;d.appendChild(nm);var sv=document.createElement("div");sv.className="scv";sv.style.fontSize="2.5rem";sv.textContent=""+G.scores[i];d.appendChild(sv);if(w===i){var wl=document.createElement("div");wl.style.color="#6abf4a";wl.style.fontSize=".72rem";wl.style.fontWeight="bold";wl.textContent="WINNER";d.appendChild(wl);}c.appendChild(d);}}
+function showShare(){recallTiles();document.getElementById("surl").textContent=window.location.href.split("?")[0]+"?g="+enc(G);document.getElementById("cpd").style.display="none";document.getElementById("sharemo").className="ovl open";}
+function copyURL(){var url=document.getElementById("surl").textContent;if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){document.getElementById("cpd").style.display="block";});}else{var ta=document.createElement("textarea");ta.value=url;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");document.getElementById("cpd").style.display="block";}catch(e){}document.body.removeChild(ta);}}
+function closeM(id){document.getElementById(id).className="ovl";}
+function showPopup(txt){var e=document.createElement("div");e.className="popup";e.textContent=txt;document.body.appendChild(e);setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e);},2200);}
+function showFloat(txt){var e=document.createElement("div");e.className="fb";e.textContent=txt;document.body.appendChild(e);setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e);},1500);}
+document.getElementById("startbtn").onclick=startGame;
+document.getElementById("subbtn").onclick=submitWord;
+document.getElementById("recbtn").onclick=recallTiles;
+document.getElementById("shubtn").onclick=shuffleRack;
+document.getElementById("pasbtn").onclick=passTurn;
+document.getElementById("shrbtn").onclick=showShare;
+document.getElementById("copybtn").onclick=copyURL;
+document.getElementById("closeshare").onclick=function(){closeM("sharemo");};
+document.getElementById("newbtn").onclick=function(){location.reload();};
+document.getElementById("p1").onkeydown=function(e){if(e.key==="Enter")document.getElementById("p2").focus();};
+document.getElementById("p2").onkeydown=function(e){if(e.key==="Enter")startGame();};
+document.querySelectorAll(".ovl").forEach(function(o){o.onclick=function(e){if(e.target===this)this.className="ovl";};});
+(function(){var saved=null;try{var p=new URLSearchParams(window.location.search).get("g");if(p)saved=dec(p);}catch(e){}if(saved&&saved.v===7){G=saved;PLACED=[];SEL=null;document.getElementById("setup").style.display="none";document.getElementById("game").style.display="block";renderAll();}})();
+</script>
+</body>
+</html>
